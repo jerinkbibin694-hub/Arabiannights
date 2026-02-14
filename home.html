@@ -1,0 +1,304 @@
+>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Al-Zaitoon | The Sultan's Grand Feast</title>
+    <link <!DOCTYPE html>
+<html lang="en">
+<headhref="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #064e3b;
+            --gold: #b45309;
+            --cream: #fffbeb;
+            --glass: rgba(255, 255, 255, 0.98);
+            --dark: #111827;
+        }
+
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: #0d1117 url('https://images.unsplash.com/photo-1541123638404-61aa0dd9a9c5?q=80&w=2000') no-repeat center center fixed;
+            background-size: cover;
+            color: #1f2937;
+        }
+
+
+        /* Header */
+        header {
+            text-align: center;
+            padding: 60px 20px;
+            background: linear-gradient(to bottom, rgba(6,78,59,0.95), rgba(0,0,0,0.7));
+            color: var(--cream);
+            border-bottom: 4px solid var(--gold);
+        }
+
+
+        header h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; margin: 0; letter-spacing: 4px; }
+
+
+        .container {
+            max-width: 1200px;
+            margin: -30px auto 100px;
+            background: var(--glass);
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            min-height: 80vh;
+            overflow: hidden;
+        }
+
+
+        /* Navigation & Controls */
+        .controls { background: var(--dark); padding: 20px; position: sticky; top: 0; z-index: 100; }
+        .search-box {
+            width: 100%; max-width: 500px; margin: 0 auto 15px; display: block;
+            padding: 12px 20px; border-radius: 30px; border: none; background: #1f2937; color: white;
+        }
+        .category-bar { display: flex; overflow-x: auto; justify-content: center; gap: 10px; scrollbar-width: none; }
+        .cat-item { color: #d1d5db; padding: 10px 20px; cursor: pointer; font-weight: 600; border-radius: 20px; transition: 0.3s; white-space: nowrap; }
+        .cat-item.active { background: var(--gold); color: white; }
+
+
+        /* Menu Grid */
+        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 25px; padding: 30px; }
+        .card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #eee; transition: 0.3s; }
+        .card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .card img { width: 100%; height: 180px; object-fit: cover; }
+        .card-body { padding: 20px; text-align: center; }
+        .card-body h3 { margin: 0 0 10px; font-family: 'Playfair Display'; font-size: 1.2rem; }
+        .price { color: var(--gold); font-weight: bold; font-size: 1.2rem; display: block; margin-bottom: 15px; }
+
+
+        /* General Buttons */
+        .btn { background: var(--primary); color: white; border: none; padding: 12px 20px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
+        .btn:hover { background: var(--gold); }
+
+
+        /* Cart/Payment UI */
+        .page { display: none; padding: 40px; }
+        .active-page { display: block; animation: fadeIn 0.4s ease; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+
+        .cart-row { display: flex; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .payment-methods { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin: 20px 0; }
+        .method-card { border: 2px solid #eee; padding: 15px; border-radius: 12px; text-align: center; cursor: pointer; }
+        .method-card.selected { border-color: var(--gold); background: #fff8f1; }
+
+
+        .toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #2e7d32; color: white; padding: 12px 25px; border-radius: 30px; display: none; z-index: 2000; }
+        .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0 10px 20px rgba(0,0,0,0.3); z-index: 1000; }
+
+
+        input, textarea { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #ddd; box-sizing: border-box; font-family: inherit; }
+    </style>
+</head>
+<body>
+
+
+<div id="toast" class="toast">Dish Added to Feast! 🥙</div>
+
+
+<header>
+    <h1>AL-ZAITOON</h1>
+    <p>TRADITION IN EVERY BITE</p>
+</header>
+
+
+<div class="container">
+    <div id="login-page" class="page active-page" style="text-align: center;">
+        <h2 style="font-family: 'Playfair Display'; font-size: 2.5rem;">Welcome</h2>
+        <p>Please enter your details to view the menu</p>
+        <div style="max-width: 400px; margin: 0 auto; padding: 20px;">
+            <input type="text" id="user-name" placeholder="Full Name">
+            <input type="tel" id="user-mobile" placeholder="Mobile Number" maxlength="10">
+            <input type="number" id="table-number" placeholder="Table Number" min="1" max="50">
+            <button class="btn" style="margin-top: 20px;" onclick="startApp()">Enter Restaurant</button>
+        </div>
+    </div>
+
+
+    <div id="menu-page" class="page" style="padding:0">
+        <div class="controls">
+            <input type="text" class="search-box" id="search" placeholder="Search menu..." oninput="render()">
+            <div class="category-bar" id="category-bar"></div>
+        </div>
+        <div class="menu-grid" id="menu-grid"></div>
+    </div>
+
+
+    <div id="cart-page" class="page">
+        <h2 style="font-family: 'Playfair Display';">Your Order Summary</h2>
+        <div id="cart-items"></div>
+        <textarea id="notes" placeholder="Special cooking instructions..."></textarea>
+        <div style="background: #f9f9f9; padding: 20px; border-radius: 15px; margin-top: 20px;">
+            <div style="display:flex; justify-content:space-between"><span>Subtotal:</span><span id="subtotal">₹0</span></div>
+            <div style="display:flex; justify-content:space-between; font-weight:bold; font-size:1.5rem; margin-top:10px; color: var(--primary);">
+                <span>Total:</span><span id="grand-total">₹0</span>
+            </div>
+        </div>
+        <button class="btn" style="margin-top: 20px; background: var(--gold);" onclick="showPage('payment-page')">Checkout</button>
+        <button class="btn" style="margin-top: 10px; background: #666;" onclick="showPage('menu-page')">Back to Menu</button>
+    </div>
+
+
+    <div id="payment-page" class="page">
+        <h2 style="font-family: 'Playfair Display';">Choose Payment</h2>
+        <div class="payment-methods">
+            <div class="method-card selected" onclick="selPay(this, 'upi')">📱 UPI</div>
+            <div class="method-card" onclick="selPay(this, 'card')">💳 Card</div>
+            <div class="method-card" onclick="selPay(this, 'cash')">💵 Cash</div>
+        </div>
+        <div id="pay-details">
+            <input type="text" placeholder="Enter UPI ID or Card Number">
+        </div>
+        <button class="btn" onclick="completeOrder()">Complete Payment</button>
+    </div>
+
+
+    <div id="success-page" class="page" style="text-align: center;">
+        <span style="font-size: 80px;">✅</span>
+        <h2>Shukran, <span id="display-name">Guest</span>!</h2>
+        <p>Your order is being prepared for <strong>Table <span id="display-table">0</span></strong>.</p>
+        <p>A confirmation SMS will be sent to your mobile.</p>
+        <button class="btn" style="max-width: 200px; margin-top:30px;" onclick="location.reload()">New Order</button>
+    </div>
+</div>
+
+
+<div class="cart-trigger" id="cart-btn" onclick="showCart()" style="display: none;">🛒 CART (<span id="count">0</span>)</div>
+
+
+<script>
+    const menuData = {
+        "Starters": [
+            { name: "Hummus Classic", price: 210, img: "https://images.unsplash.com/photo-1577906030551-59758a9136e6?w=400" },
+            { name: "Moutabal", price: 230, img: "https://images.unsplash.com/photo-1628294895950-9805252327bc?w=400" },
+            { name: "Falafel (6pc)", price: 180, img: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=400" },
+            { name: "Tabbouleh", price: 190, img: "https://images.unsplash.com/photo-1593001874117-c99c4edb3085?w=400" },
+            { name: "Vine Leaves", price: 250, img: "https://images.unsplash.com/photo-1629983445100-247071981d11?w=400" }
+        ],
+        "Soups": [
+            { name: "Lentil Shorba", price: 170, img: "https://images.unsplash.com/photo-1547592110-80399738d946?w=400" },
+            { name: "Chicken Cream", price: 200, img: "https://images.unsplash.com/photo-1603105037880-880cd4edfb0d?w=400" },
+            { name: "Harira Soup", price: 230, img: "https://images.unsplash.com/photo-1547731030-cd126f44e9c5?w=400" }
+        ],
+        "Main Courses": [
+            { name: "Lamb Mandi", price: 580, img: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400" },
+            { name: "Chicken Kabsa", price: 480, img: "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=400" },
+            { name: "Mixed Grill", price: 850, img: "https://images.unsplash.com/photo-1529006557810-274b9b2fc783?w=400" },
+            { name: "Shish Taouk Plate", price: 390, img: "https://images.unsplash.com/photo-1547050605-2f4067eca57a?w=400" }
+        ],
+        "Drinks": [
+            { name: "Mint Lemonade", price: 130, img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400" },
+            { name: "Turkish Coffee", price: 120, img: "https://images.unsplash.com/photo-1618164435735-413d3b066c9a?w=400" },
+            { name: "Arabic Qahwa", price: 90, img: "https://images.unsplash.com/photo-1624517316159-4d641147814c?w=400" }
+        ],
+        "Desserts": [
+            { name: "Baklava", price: 290, img: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400" },
+            { name: "Kunafa", price: 380, img: "https://images.unsplash.com/photo-1610450531518-e39097d84878?w=400" },
+            { name: "Umm Ali", price: 250, img: "https://images.unsplash.com/photo-1589119908995-c6837fa14848?w=400" }
+        ]
+    };
+
+
+    let cart = [], currentCat = "Starters";
+    let guestInfo = { name: "", mobile: "", table: "" };
+
+
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(id).classList.add('active-page');
+        window.scrollTo(0,0);
+    }
+
+
+    function startApp() {
+        const name = document.getElementById('user-name').value;
+        const mobile = document.getElementById('user-mobile').value;
+        const table = document.getElementById('table-number').value;
+
+
+        if(name && mobile && table) {
+            guestInfo = { name, mobile, table };
+           
+            // Set values for the success page
+            document.getElementById('display-name').innerText = name;
+            document.getElementById('display-table').innerText = table;
+
+
+            initMenu();
+            showPage('menu-page');
+            document.getElementById('cart-btn').style.display = 'block';
+        } else {
+            alert("Please provide Name, Mobile, and Table Number.");
+        }
+    }
+
+
+    function initMenu() {
+        const bar = document.getElementById('category-bar');
+        bar.innerHTML = "";
+        Object.keys(menuData).forEach(cat => {
+            const div = document.createElement('div');
+            div.className = `cat-item ${cat === currentCat ? 'active' : ''}`;
+            div.innerText = cat;
+            div.onclick = () => { currentCat = cat; render(); initMenu(); };
+            bar.appendChild(div);
+        });
+        render();
+    }
+
+
+    function render() {
+        const grid = document.getElementById('menu-grid');
+        const search = document.getElementById('search').value.toLowerCase();
+        grid.innerHTML = "";
+       
+        let pool = search ? Object.values(menuData).flat() : menuData[currentCat];
+        pool.filter(i => i.name.toLowerCase().includes(search)).forEach(i => {
+            grid.innerHTML += `
+                <div class="card">
+                    <img src="${i.img}">
+                    <div class="card-body">
+                        <h3>${i.name}</h3>
+                        <span class="price">₹${i.price}</span>
+                        <button class="btn" onclick="add('${i.name}', ${i.price})">Add to Cart</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+
+
+    function add(name, price) {
+        cart.push({name, price});
+        document.getElementById('count').innerText = cart.length;
+        const t = document.getElementById('toast');
+        t.style.display = 'block';
+        setTimeout(() => t.style.display = 'none', 1500);
+    }
+
+
+    function showCart() {
+        const items = document.getElementById('cart-items');
+        let total = 0;
+        items.innerHTML = cart.length ? "" : "Empty feast...";
+        cart.forEach((i) => {
+            items.innerHTML += `<div class="cart-row"><span>${i.name}</span><span>₹${i.price}</span></div>`;
+            total += i.price;
+        });
+        document.getElementById('subtotal').innerText = "₹" + total;
+        document.getElementById('grand-total').innerText = "₹" + (total + (total*0.05)).toFixed(0);
+        showPage('cart-page');
+    }
+
+
+    function selPay(el, mode) {
+        document.querySelectorAll('.method-card').forEach(c => c.classList.remove('selected'));
+        el.classList.add('selected');
+    }
+</script>
+</body>
+</html>
+

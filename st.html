@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Staff Orders</title>
+<style>
+body { font-family: Arial; padding: 20px; background:#f4f4f4; }
+.order-card {
+    background:white;
+    padding:15px;
+    margin-bottom:15px;
+    border-radius:10px;
+    box-shadow:0 5px 10px rgba(0,0,0,0.1);
+}
+</style>
+</head>
+<body>
+
+<h1>📋 Staff Order Panel</h1>
+<div id="orders"></div>
+
+<script>
+const orders = JSON.parse(localStorage.getItem("orders")) || [];
+const container = document.getElementById("orders");
+
+if(orders.length === 0){
+    container.innerHTML = "No Orders Yet.";
+} else {
+    orders.forEach(o => {
+        container.innerHTML += `
+        <div class="order-card">
+            <h3>Table ${o.table} - ${o.name}</h3>
+            <p><strong>Mobile:</strong> ${o.mobile}</p>
+            <p><strong>Items:</strong></p>
+            <ul>
+                ${o.items.map(i => `<li>${i.name} - ₹${i.price}</li>`).join("")}
+            </ul>
+            <p><strong>Total:</strong> ${o.total}</p>
+            <small>${o.time}</small>
+        </div>
+        `;
+    });
+}
+</script>
+
+</body>
+</html>

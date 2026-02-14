@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Book a Table</title>
+<style>
+body {
+    font-family: Arial;
+    background:#fff8f0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+.card {
+    background:white;
+    padding:30px;
+    border-radius:15px;
+    box-shadow:0 10px 20px rgba(0,0,0,0.1);
+    width:350px;
+}
+input, button {
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+button {
+    background:#064e3b;
+    color:white;
+    border:none;
+}
+</style>
+</head>
+<body>
+
+<div class="card">
+<h2>🍽 Book Your Table</h2>
+
+<input type="text" id="name" placeholder="Full Name">
+<input type="tel" id="mobile" placeholder="Mobile Number">
+<input type="date" id="date">
+<input type="time" id="time">
+<input type="number" id="guests" placeholder="Number of Guests">
+
+<button onclick="book()">Book Now</button>
+
+<p id="msg"></p>
+</div>
+
+<script>
+function book(){
+    const booking = {
+        name: name.value,
+        mobile: mobile.value,
+        date: date.value,
+        time: time.value,
+        guests: guests.value
+    };
+
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    bookings.push(booking);
+    localStorage.setItem("bookings", JSON.stringify(bookings));
+
+    msg.innerText = "Table Booked Successfully ✅";
+}
+</script>
+
+</body>
+</html>
