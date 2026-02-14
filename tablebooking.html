@@ -1,66 +1,185 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Book a Table</title>
+<title>Restaurant Table Booking</title>
+
 <style>
 body {
+    margin:0;
     font-family: Arial;
-    background:#fff8f0;
     display:flex;
     justify-content:center;
     align-items:center;
     height:100vh;
+    overflow:hidden;
+    animation: fadeIn 1.5s ease-in-out;
 }
+
+/* Page fade animation */
+@keyframes fadeIn {
+    from {opacity:0;}
+    to {opacity:1;}
+}
+
+/* Background Video */
+.bg-video{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    z-index:-2;
+}
+
+/* Dark Overlay */
+.overlay{
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(0,0,0,0.4);
+    z-index:-1;
+}
+
+/* Card Design */
 .card {
-    background:white;
-    padding:30px;
-    border-radius:15px;
-    box-shadow:0 10px 20px rgba(0,0,0,0.1);
+    padding:50px;
+    border-radius:20px;
+    box-shadow:0 10px 70px rgba(0,0,0,0.3);
     width:350px;
+    background:;
+    animation: slideUp 1s ease-out;
 }
+
+@keyframes slideUp {
+    from {opacity:0; transform:translateY(40px);}
+    to {opacity:1; transform:translateY(0);}
+}
+
 input, button {
     width:100%;
     padding:10px;
     margin:10px 0;
 }
+
 button {
     background:#064e3b;
     color:white;
     border:none;
+    cursor:pointer;
+}
+
+.success{
+    display:none;
+}
+/* ABOUT BUTTON STYLE */
+.about-btn{
+    position:absolute;
+    top:25px;
+    right:30px;
+    padding:10px 22px;
+    background:#FFD700;
+    color:black;
+    text-decoration:none;
+    font-weight:bold;
+    border-radius:30px;
+    box-shadow:0 5px 15px rgba(0,0,0,0.3);
+    transition:0.3s ease;
+}
+
+/* Hover effect */
+.about-btn:hover{
+    background:white;
+    transform:scale(1.1);
 }
 </style>
 </head>
+
 <body>
+<a href="about.html" class="about-btn">About Us</a>
+<video autoplay muted loop class="bg-video">
+    <source src="video.mp4" type="video/mp4">
+</video>
 
-<div class="card">
-<h2>🍽 Book Your Table</h2>
+<div class="overlay"></div>
 
-<input type="text" id="name" placeholder="Full Name">
-<input type="tel" id="mobile" placeholder="Mobile Number">
-<input type="date" id="date">
-<input type="time" id="time">
-<input type="number" id="guests" placeholder="Number of Guests">
+<!-- Booking Form -->
+<div class="card" id="bookingForm">
+<h2 style="text-align:center;color:yellow;">Book Your Table</h2>
+
+<input type="text" id="name" placeholder="Full Name" required>
+
+<input type="tel" id="mobile" placeholder="Mobile Number"
+maxlength="10" pattern="[0-9]{10}" required>
+
+<input type="date" id="date" required>
+
+<input type="time" id="time" required>
+
+<input type="number" id="guests" placeholder="Number of Guests"
+min="1" max="20" required>
 
 <button onclick="book()">Book Now</button>
 
-<p id="msg"></p>
+<p id="msg" style="color:red;text-align:center;"></p>
+</div>
+
+
+<div class="card success" id="successPage">
+<h2 style="color:green;text-align:center;">✅ Booking Confirmed!</h2>
+
+<p><strong>Name:</strong> <span id="sname"></span></p>
+<p><strong>Mobile:</strong> <span id="smobile"></span></p>
+<p><strong>Date:</strong> <span id="sdate"></span></p>
+<p><strong>Time:</strong> <span id="stime"></span></p>
+<p><strong>Guests:</strong> <span id="sguests"></span></p>
+
+<button onclick="goBack()">Back</button>
 </div>
 
 <script>
+
+// Prevent previous dates
+let today = new Date().toISOString().split("T")[0];
+document.getElementById("date").setAttribute("min", today);
+
 function book(){
-    const booking = {
-        name: name.value,
-        mobile: mobile.value,
-        date: date.value,
-        time: time.value,
-        guests: guests.value
-    };
 
-    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-    bookings.push(booking);
-    localStorage.setItem("bookings", JSON.stringify(bookings));
+    let name = document.getElementById("name").value;
+    let mobile = document.getElementById("mobile").value;
+    let date = document.getElementById("date").value;
+    let time = document.getElementById("time").value;
+    let guests = document.getElementById("guests").value;
 
-    msg.innerText = "Table Booked Successfully ✅";
+    if(mobile.length != 10){
+        document.getElementById("msg").innerText = "Phone number must be 10 digits!";
+        return;
+    }
+
+    if(guests > 20){
+        document.getElementById("msg").innerText = "Maximum 20 guests allowed!";
+        return;
+    }
+
+    // Hide booking form
+    document.getElementById("bookingForm").style.display="none";
+
+    // Show success page
+    document.getElementById("successPage").style.display="block";
+
+    // Display details
+    document.getElementById("sname").innerText = name;
+    document.getElementById("smobile").innerText = mobile;
+    document.getElementById("sdate").innerText = date;
+    document.getElementById("stime").innerText = time;
+    document.getElementById("sguests").innerText = guests;
+}
+
+function goBack(){
+    document.getElementById("successPage").style.display="none";
+    document.getElementById("bookingForm").style.display="block";
 }
 </script>
 
