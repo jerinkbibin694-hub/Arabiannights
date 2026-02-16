@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Staff Login</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.box{
+    background:#1c1c1c;
+    padding:40px;
+    border-radius:20px;
+    width:350px;
+    text-align:center;
+}
+
+h2{
+    color:#FFD700;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#FFD700;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div class="box">
+<h2>Staff Login</h2>
+
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+<p id="msg" style="color:red;"></p>
+</div>
+
+<script>
+
+if(sessionStorage.getItem("staffLoggedIn") === "true"){
+    window.location.replace("staff.html");
+}
+
+function login(){
+
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    const staffUser = "master";
+    const staffPass = "555";
+
+    if(user === "" || pass === ""){
+        document.getElementById("msg").innerText = "All fields required!";
+        return;
+    }	
+
+    if(user === staffUser && pass === staffPass){
+        sessionStorage.setItem("staffLoggedIn","true");
+        window.location.replace("staff.html");
+    } else {
+        document.getElementById("msg").innerText = "Invalid credentials!";
+    }
+}
+
+</script>
+
+</body>
+</html>

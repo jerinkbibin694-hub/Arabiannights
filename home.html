@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Al-Zaitoon | The Sultan's Grand Feast</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    --primary: #064e3b;
+    --gold: #b45309;
+    --cream: #fffbeb;
+    --glass: rgba(255, 255, 255, 0.98);
+    --dark: #111827;
+}
+
+body {
+    margin: 0;
+    font-family: 'Poppins', sans-serif;
+    background: #0d1117 url('https://images.unsplash.com/photo-1541123638404-61aa0dd9a9c5?q=80&w=2000') no-repeat center center fixed;
+    background-size: cover;
+    color: #1f2937;
+}
+
+header {
+    text-align: center;
+    padding: 60px 20px;
+    background: linear-gradient(to bottom, rgba(6,78,59,0.95), rgba(0,0,0,0.7));
+    color: var(--cream);
+    border-bottom: 4px solid var(--gold);
+    position: relative;
+}
+
+header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 3.5rem;
+    margin: 0;
+    letter-spacing: 4px;
+}
+
+.staff-btn{
+    position:absolute;
+    top:20px;
+    right:30px;
+    background:#FFD700;
+    color:black;
+    padding:8px 18px;
+    text-decoration:none;
+    border-radius:20px;
+    font-weight:bold;
+}
+
+.container {
+    max-width: 1200px;
+    margin: -30px auto 100px;
+    background: var(--glass);
+    border-radius: 30px;
+    box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+    min-height: 80vh;
+    overflow: hidden;
+}
+
+.page { display: none; padding: 40px; }
+.active-page { display: block; }
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+    padding: 30px;
+}
+
+.card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    border: 1px solid #eee;
+}
+
+.card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.card-body {
+    padding: 20px;
+    text-align: center;
+}
+
+.price {
+    color: var(--gold);
+    font-weight: bold;
+    font-size: 1.2rem;
+    display: block;
+    margin-bottom: 15px;
+}
+
+.btn {
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+}
+
+.btn:hover {
+    background: var(--gold);
+}
+
+.cart-trigger {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: var(--gold);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-weight: bold;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>AL-ZAITOON</h1>
+<p>TRADITION IN EVERY BITE</p>
+<a href="staff-login.html" class="staff-btn">Staff</a>
+</header>
+
+<div class="container">
+
+<div id="login-page" class="page active-page" style="text-align:center;">
+<h2>Welcome</h2>
+<input type="text" id="user-name" placeholder="Full Name"><br><br>
+<input type="tel" id="user-mobile" placeholder="Mobile Number"><br><br>
+<input type="number" id="table-number" placeholder="Table Number"><br><br>
+<button class="btn" onclick="startApp()">Enter Restaurant</button>
+</div>
+
+<div id="menu-page" class="page">
+<div class="menu-grid" id="menu-grid"></div>
+</div>
+
+<div id="cart-page" class="page">
+<h2>Your Order</h2>
+<div id="cart-items"></div>
+<p><strong>Total: </strong><span id="grand-total">₹0</span></p>
+<button class="btn" onclick="completeOrder()">Complete Payment</button>
+</div>
+
+<div id="success-page" class="page" style="text-align:center;">
+<h2>✅ Order Placed Successfully!</h2>
+<p>Your order is being prepared.</p>
+<button class="btn" onclick="location.reload()">New Order</button>
+</div>
+
+</div>
+
+<div class="cart-trigger" onclick="showCart()">
+🛒 CART (<span id="count">0</span>)
+</div>
+
+<script>
+
+const menuData = [
+{ name: "Hummus Classic", price: 210, img: "https://images.unsplash.com/photo-1577906030551-59758a9136e6?w=400" },
+{ name: "Falafel", price: 180, img: "https://images.unsplash.com/photo-1541518763669-27fef04b14ea?w=400" },
+{ name: "Lamb Mandi", price: 580, img: "https://images.unsplash.com/photo-1633945274405-b6c8069047b0?w=400" },
+{ name: "Baklava", price: 290, img: "https://images.unsplash.com/photo-1519676867240-f03562e64548?w=400" }
+];
+
+let cart = [];
+let guestInfo = {};
+
+function showPage(id){
+document.querySelectorAll('.page').forEach(p=>p.classList.remove('active-page'));
+document.getElementById(id).classList.add('active-page');
+}
+
+function startApp(){
+guestInfo.name = document.getElementById("user-name").value;
+guestInfo.mobile = document.getElementById("user-mobile").value;
+guestInfo.table = document.getElementById("table-number").value;
+
+if(!guestInfo.name || !guestInfo.mobile || !guestInfo.table){
+alert("Please fill all details");
+return;
+}
+
+renderMenu();
+showPage("menu-page");
+}
+
+function renderMenu(){
+let grid = document.getElementById("menu-grid");
+grid.innerHTML = "";
+menuData.forEach(item=>{
+grid.innerHTML += `
+<div class="card">
+<img src="${item.img}">
+<div class="card-body">
+<h3>${item.name}</h3>
+<span class="price">₹${item.price}</span>
+<button class="btn" onclick="addToCart('${item.name}',${item.price})">Add to Cart</button>
+</div>
+</div>
+`;
+});
+}
+
+function addToCart(name,price){
+cart.push({name,price});
+document.getElementById("count").innerText = cart.length;
+}
+
+function showCart(){
+let container = document.getElementById("cart-items");
+let total = 0;
+container.innerHTML = "";
+cart.forEach(item=>{
+container.innerHTML += `${item.name} - ₹${item.price}<br>`;
+total += item.price;
+});
+document.getElementById("grand-total").innerText = "₹"+total;
+showPage("cart-page");
+}
+
+function completeOrder(){
+
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+
+orders.push({
+id: Date.now(),
+name: guestInfo.name,
+mobile: guestInfo.mobile,
+table: guestInfo.table,
+items: cart,
+status: "Pending",
+notified:false
+});
+
+localStorage.setItem("orders", JSON.stringify(orders));
+
+cart = [];
+showPage("success-page");
+}
+
+</script>
+
+</body>
+</html>

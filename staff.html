@@ -1,0 +1,144 @@
+	<!DOCTYPE html>
+<html>
+<head>
+<title>Kitchen Staff Panel</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    padding:30px;
+}
+
+h1{
+    text-align:center;
+    color:#FFD700;
+}
+
+.order-card{
+    background:#1c1c1c;
+    padding:20px;
+    margin:20px 0;
+    border-radius:15px;
+}
+
+input{
+    padding:5px;
+    width:60px;
+}
+
+button{
+    background:#FFD700;
+    border:none;
+    padding:5px 10px;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:10px;
+}
+
+.status{
+    font-weight:bold;
+}
+</style>
+</head>
+<body>
+
+<h1>Kitchen Staff Panel</h1>
+<button onclick="logout()" style="float:right;">Logout</button>
+
+<div id="orders"></div>
+
+<script>
+
+// Protect page
+if(sessionStorage.getItem("staffLoggedIn") !== "true"){
+    window.location.replace("staff-login.html");
+}
+
+function logout(){
+    sessionStorage.removeItem("staffLoggedIn");
+    window.location.replace("staff-login.html");
+}
+
+// Ask notification permission
+if("Notification" in window){
+    Notification.requestPermission();
+}
+
+function loadOrders(){
+
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    let container = document.getElementById("orders");
+    container.innerHTML = "";
+
+    if(orders.length === 0){
+        container.innerHTML = "No orders yet.";
+        return;
+    }
+
+    orders.forEach((order,index)=>{
+
+        // 🔔 NEW ORDER NOTIFICATION
+        if(order.notified === false){
+            if(Notification.permission === "granted"){
+                new Notification("New Order!", {
+                    body: "Table " + order.table + " placed an order."
+                });
+            }
+            order.notified = true;
+            localStorage.setItem("orders", JSON.stringify(orders));
+        }
+
+        let itemsHTML = "";
+
+        order.items.forEach((item,itemIndex)=>{
+            itemsHTML += `
+                ${item.name} - ₹${item.price}
+                <br>
+                Time: <input type="number" min="1" 
+                value="${item.time === "Not Set" ? "" : item.time.replace(" mins","")}"
+                onchange="setTime(${index},${itemIndex},this.value)">
+                mins
+                <br><br>
+            `;
+        });
+
+        container.innerHTML += `
+        <div class="order-card">
+            <strong>Customer:</strong> ${order.name}<br>
+            <strong>Table:</strong> ${order.table}<br>
+            <strong>Status:</strong> 
+            <span class="status">${order.status}</span>
+            <br><br>
+            ${itemsHTML}
+            <button onclick="updateStatus(${index},'Preparing')">Preparing</button>
+            <button onclick="updateStatus(${index},'Ready')">Ready</button>
+        </div>
+        `;
+    });
+}
+
+function setTime(orderIndex,itemIndex,time){
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders[orderIndex].items[itemIndex].time = time + " mins";
+    localStorage.setItem("orders", JSON.stringify(orders));
+}
+
+function updateStatus(index,status){
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    orders[index].status = status;
+    localStorage.setItem("orders", JSON.stringify(orders));
+    loadOrders();
+}
+
+// Auto refresh every 5 seconds
+setInterval(loadOrders, 5000);
+
+loadOrders();
+
+</script>
+
+</body>
+</html>

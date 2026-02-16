@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Login</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    height:100vh;
+}
+
+.login-box{
+    background:#1c1c1c;
+    padding:40px;
+    border-radius:20px;
+    width:350px;
+    text-align:center;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+}
+
+h2{
+    color:#FFD700;
+}
+
+input{
+    width:100%;
+    padding:10px;
+    margin:10px 0;
+    border-radius:8px;
+    border:none;
+}
+
+button{
+    width:100%;
+    padding:10px;
+    background:#FFD700;
+    border:none;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+button:hover{
+    background:white;
+}
+</style>
+</head>
+
+<body>
+
+<div class="login-box">
+<h2>Admin Login</h2>
+
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+
+<button onclick="login()">Login</button>
+
+<p id="msg" style="color:red;"></p>
+</div>
+
+<script>
+
+// If already logged in → go to admin panel
+if(sessionStorage.getItem("adminLoggedIn") === "true"){
+    window.location.replace("admin.html");
+}
+
+function login(){
+
+    const user = document.getElementById("username").value.trim();
+    const pass = document.getElementById("password").value.trim();
+
+    const adminUser = "jk";
+    const adminPass = "4811";
+    
+
+    // Empty validation
+    if(user === "" || pass === ""){
+        document.getElementById("msg").innerText = "All fields are required!";
+        return;
+    }
+
+    // Credential check
+    if(user === adminUser && pass === adminPass){
+
+        sessionStorage.setItem("adminLoggedIn", "true");
+        window.location.replace("admin.html");
+
+    } else {
+        document.getElementById("msg").innerText = "Invalid username or password!";
+    }
+}
+
+</script>
+
+</body>
+</html>

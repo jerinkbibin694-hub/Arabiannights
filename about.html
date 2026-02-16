@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>About Us - Arabian Nights</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#111;
+    color:white;
+}
+
+/* HERO SECTION */
+.hero{
+    height:50vh;
+    background:linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)),
+    url("https://images.unsplash.com/photo-1555992336-03a23c8c9a18");
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    text-align:center;
+}
+
+.hero h1{
+    font-size:50px;
+    color:#FFD700;
+}
+
+.hero p{
+    font-size:20px;
+    max-width:700px;
+    margin:auto;
+}
+
+/* ABOUT CONTENT */
+.about{
+    padding:80px 20px;
+    text-align:center;
+}
+
+.about-content{
+    max-width:900px;
+    margin:auto;
+    background:#1c1c1c;
+    padding:50px;
+    border-radius:20px;
+    box-shadow:0 10px 40px rgba(0,0,0,0.6);
+    animation: fadeUp 1.5s ease-in-out;
+}
+
+.about-content h2{
+    color:#FFD700;
+    margin-bottom:20px;
+}
+
+.about-content p{
+    line-height:1.8;
+    margin-bottom:20px;
+}
+
+.highlight{
+    color:#FFD700;
+    font-weight:bold;
+    font-size:18px;
+}
+
+/* Animation */
+@keyframes fadeUp{
+    from{opacity:0; transform:translateY(30px);}
+    to{opacity:1; transform:translateY(0);}
+}
+
+/* Button */
+.btn{
+    display:inline-block;
+    margin-top:20px;
+    padding:10px 25px;
+    background:#FFD700;
+    color:black;
+    text-decoration:none;
+    border-radius:25px;
+    font-weight:bold;
+}
+.btn:hover{
+    background:white;
+}
+</style>
+</head>
+
+<body>
+<div class="hero">
+    <div>
+        <h1>Arabian Nights</h1>
+        <p>Where Every Meal Tells a Story</p>
+    </div>
+</div>
+
+<!-- ABOUT CONTENT -->
+<div class="about">
+    <div class="about-content">
+        <h2>Our Story</h2>
+
+        <p>
+        At <strong>Arabian Nights</strong>, we believe that dining is more than just eating—it is a journey.
+        Inspired by the timeless tales of the One Thousand and One Nights,
+        our restaurant brings the magic, mystery, and hospitality of the Middle East right to your table.
+        </p>
+
+        <p>
+        From the smoky aroma of our charcoal-grilled meats to the delicate sweetness of our desserts,
+        every dish is crafted to transport you to a world of flavor.
+        Whether you are gathering for a family feast or a quiet dinner under the stars,
+        we invite you to experience the warmth of true Arabian hospitality.
+        </p>
+
+        <p class="highlight">Join us, and let the feast begin.</p>
+
+        <a href="tablebooking.html" class="btn">Back to Booking</a>
+    </div>
+</div>
+
+</body>
+</html>

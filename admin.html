@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Admin Panel</title>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#111;
+    color:white;
+    padding:30px;
+}
+
+h1{
+    color:#FFD700;
+    text-align:center;
+}
+
+.logout-btn{
+    position:absolute;
+    top:20px;
+    right:30px;
+    background:#FFD700;
+    border:none;
+    padding:8px 15px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.section{
+    background:#1c1c1c;
+    padding:20px;
+    margin:20px 0;
+    border-radius:15px;
+}
+
+.card{
+    background:#222;
+    padding:15px;
+    margin:10px 0;
+    border-radius:10px;
+}
+</style>
+</head>
+<body>
+
+<button class="logout-btn" onclick="logout()">Logout</button>
+
+<h1>Arabian Nights Admin Panel</h1>
+
+<div class="section">
+<h2>📅 Table Bookings</h2>
+<div id="bookingList"></div>
+</div>
+
+<div class="section">
+<h2>🛒 Menu Orders</h2>
+<div id="orderList"></div>
+</div>
+
+<script>
+
+// STRICT PROTECTION
+if(sessionStorage.getItem("adminLoggedIn") !== "true"){
+    window.location.replace("admin-login.html");
+}
+
+// LOGOUT
+function logout(){
+    sessionStorage.removeItem("adminLoggedIn");
+    window.location.replace("admin-login.html");
+}
+
+
+// SHOW BOOKINGS
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+let bookingList = document.getElementById("bookingList");
+
+if(bookings.length === 0){
+    bookingList.innerHTML = "No bookings yet.";
+} else {
+    bookings.forEach((b)=>{
+        bookingList.innerHTML += `
+        <div class="card">
+            <strong>Name:</strong> ${b.name}<br>
+            <strong>Mobile:</strong> ${b.mobile}<br>
+            <strong>Date:</strong> ${b.date}<br>
+            <strong>Time:</strong> ${b.time}<br>
+            <strong>Guests:</strong> ${b.guests}
+        </div>
+        `;
+    });
+}
+
+
+// SHOW ORDERS
+let orders = JSON.parse(localStorage.getItem("orders")) || [];
+let orderList = document.getElementById("orderList");
+
+if(orders.length === 0){
+    orderList.innerHTML = "No orders yet.";
+} else {
+    orders.forEach((o)=>{
+        let itemsHTML = "";
+        o.items.forEach(item=>{
+            itemsHTML += item.name + " - ₹" + item.price + "<br>";
+        });
+
+        orderList.innerHTML += `
+        <div class="card">
+            <strong>Name:</strong> ${o.name}<br>
+            <strong>Table:</strong> ${o.table}<br>
+            <strong>Total:</strong> ${o.total}<br>
+            <strong>Items:</strong><br>
+            ${itemsHTML}
+        </div>
+        `;
+    });
+}
+
+</script>
+
+</body>
+</html>

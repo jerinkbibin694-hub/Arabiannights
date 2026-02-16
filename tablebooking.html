@@ -175,6 +175,18 @@ function book(){
     document.getElementById("sdate").innerText = date;
     document.getElementById("stime").innerText = time;
     document.getElementById("sguests").innerText = guests;
+// Save booking to localStorage
+let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+
+bookings.push({
+    name: name,
+    mobile: mobile,
+    date: date,
+    time: time,
+    guests: guests
+});
+
+localStorage.setItem("bookings", JSON.stringify(bookings));
 }
 
 function goBack(){
