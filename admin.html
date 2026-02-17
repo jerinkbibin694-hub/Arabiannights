@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Admin Panel</title>
+<title>Admin Panel - Arabian Nights</title>
 
 <style>
 body{
@@ -40,6 +40,26 @@ h1{
     padding:15px;
     margin:10px 0;
     border-radius:10px;
+    border-left: 4px solid #FFD700;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.status-pending { background: #b45309; color: white; }
+.status-preparing { background: #2563eb; color: white; }
+.status-ready { background: #059669; color: white; }
+
+.refresh-note {
+    text-align: center;
+    color: #666;
+    font-size: 12px;
+    margin-top: 20px;
 }
 </style>
 </head>
@@ -59,6 +79,8 @@ h1{
 <div id="orderList"></div>
 </div>
 
+<div class="refresh-note">Auto-refreshes every 5 seconds</div>
+
 <script>
 
 // STRICT PROTECTION
@@ -72,52 +94,74 @@ function logout(){
     window.location.replace("admin-login.html");
 }
 
+// Auto-refresh admin panel every 5 seconds
+function refreshData() {
+    // Reload bookings
+    let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
+    let bookingList = document.getElementById("bookingList");
+    
+    bookingList.innerHTML = "";
+    if(bookings.length === 0){
+        bookingList.innerHTML = "No bookings yet.";
+    } else {
+        bookings.forEach((b)=>{
+            bookingList.innerHTML += `
+            <div class="card">
+                <strong>Name:</strong> ${b.name}<br>
+                <strong>Mobile:</strong> ${b.mobile}<br>
+                <strong>Date:</strong> ${b.date}<br>
+                <strong>Time:</strong> ${b.time}<br>
+                <strong>Guests:</strong> ${b.guests}
+            </div>
+            `;
+        });
+    }
 
-// SHOW BOOKINGS
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-let bookingList = document.getElementById("bookingList");
-
-if(bookings.length === 0){
-    bookingList.innerHTML = "No bookings yet.";
-} else {
-    bookings.forEach((b)=>{
-        bookingList.innerHTML += `
-        <div class="card">
-            <strong>Name:</strong> ${b.name}<br>
-            <strong>Mobile:</strong> ${b.mobile}<br>
-            <strong>Date:</strong> ${b.date}<br>
-            <strong>Time:</strong> ${b.time}<br>
-            <strong>Guests:</strong> ${b.guests}
-        </div>
-        `;
-    });
-}
-
-
-// SHOW ORDERS
-let orders = JSON.parse(localStorage.getItem("orders")) || [];
-let orderList = document.getElementById("orderList");
-
-if(orders.length === 0){
-    orderList.innerHTML = "No orders yet.";
-} else {
-    orders.forEach((o)=>{
-        let itemsHTML = "";
-        o.items.forEach(item=>{
-            itemsHTML += item.name + " - ₹" + item.price + "<br>";
+    // Reload orders
+    let orders = JSON.parse(localStorage.getItem("orders")) || [];
+    let orderList = document.getElementById("orderList");
+    
+    orderList.innerHTML = "";
+    if(orders.length === 0){
+        orderList.innerHTML = "No orders yet.";
+    } else {
+        // Sort orders by status (Pending first, then Preparing, then Ready)
+        orders.sort((a, b) => {
+            const statusOrder = { "Pending": 1, "Preparing": 2, "Ready": 3 };
+            return (statusOrder[a.status] || 4) - (statusOrder[b.status] || 4);
         });
 
-        orderList.innerHTML += `
-        <div class="card">
-            <strong>Name:</strong> ${o.name}<br>
-            <strong>Table:</strong> ${o.table}<br>
-            <strong>Total:</strong> ${o.total}<br>
-            <strong>Items:</strong><br>
-            ${itemsHTML}
-        </div>
-        `;
-    });
+        orders.forEach((o)=>{
+            let itemsHTML = "";
+            let statusClass = "status-pending";
+            if(o.status === "Preparing") statusClass = "status-preparing";
+            if(o.status === "Ready") statusClass = "status-ready";
+            
+            o.items.forEach(item=>{
+                itemsHTML += `${item.name} x${item.quantity} - ₹${item.price * item.quantity}<br>`;
+            });
+
+            orderList.innerHTML += `
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <strong>Order #${o.id.toString().slice(-6)}</strong>
+                    <span class="status-badge ${statusClass}">${o.status || "Pending"}</span>
+                </div>
+                <strong>Customer:</strong> ${o.name}<br>
+                <strong>Table:</strong> ${o.table}<br>
+                <strong>Time:</strong> ${new Date(o.timestamp).toLocaleTimeString()}<br>
+                <strong>Total:</strong> ${o.total}<br>
+                <strong>Items:</strong><br>
+                ${itemsHTML}
+            </div>
+            `;
+        });
+    }
 }
+
+// Refresh every 5 seconds
+setInterval(refreshData, 5000);
+refreshData(); // Initial load
 
 </script>
 
