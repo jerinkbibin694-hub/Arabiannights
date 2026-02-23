@@ -69,11 +69,11 @@
             <span class="waiting-text">QR code will appear here automatically</span>
         </div>
         
-        <div class="footer-note">Accepted: UPI, Google Pay, PhonePe, Paytm</div>
+        <div class="footer-note">Powered by Easy PayIO Secure Gateway</div>
     </div>
 
     <script>
-        // 1. Initialize Firebase (Exact same config from your home.html)
+        // 1. Initialize Firebase 
         const firebaseConfig = {
             apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
             authDomain: "arabian-nights-cca24.firebaseapp.com",
@@ -89,39 +89,35 @@
 
         let currentQrCode = null;
 
-        // 2. Listen for the most recent order added to Firebase
-        // We limit to the last 1 so it only triggers for the newest checkout
+        // 2. Listen for the most recent order
         database.ref('orders').orderByChild('timestamp').limitToLast(1).on('value', (snapshot) => {
             snapshot.forEach((childSnapshot) => {
                 const order = childSnapshot.val();
                 
-                // Only update if the user selected QR code payment and it's pending/unpaid
+                // Only update if it's a QR payment and has an amount
                 if (order.paymentMethod.includes("QR") && order.totalAmount > 0) {
                     updateDisplay(order);
                 }
             });
         });
 
-        // 3. Update the screen and generate the new QR
+        // 3. Update the screen and generate the EasyPayIO link QR
         function updateDisplay(order) {
-            // Update text on screen
             document.getElementById('order-details').innerText = `Table ${order.table} | Order #${order.orderNumber}`;
             document.getElementById('display-amount').innerText = `₹${order.totalAmount}`;
             
-            // Clear the old QR code
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = ""; 
 
-            // Create the standard UPI string with the specific dynamic amount (&am=)
-            // Replace 'your-upi-id@bank' with your actual business UPI ID
-            const upiId = "arabiannights@easypayio"; 
-            const merchantName = "Arabian%20Nights";
+            // Construct the unique Easy PayIO URL
+            // This includes the dynamic amount and order ID to make every QR unique
+            const apiKey = "ep_4ya7hmnawmlumyxjn"; // From your easypayio config
             const amount = order.totalAmount;
+            const orderId = order.id;
             
-            // This string will pre-fill the amount in Google Pay / PhonePe
-            const paymentString = `upi://pay?pa=${upiId}&pn=${merchantName}&am=${amount}&cu=INR`;
+            const paymentString = `https://easy-pay-gateway.web.app?amount=${amount}&orderId=${orderId}&apiKey=${apiKey}`;
 
-            // Generate the new QR Code
+            // Generate the QR Code with the Easy PayIO link
             currentQrCode = new QRCode(qrContainer, {
                 text: paymentString,
                 width: 250,
