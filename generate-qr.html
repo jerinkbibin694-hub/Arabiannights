@@ -12,49 +12,17 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     
     <style>
-        :root {
-            --primary: #0f172a;
-            --gold: #b45309;
-        }
-        body {
-            margin: 0;
-            font-family: 'Poppins', sans-serif;
-            background: var(--primary);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
-            text-align: center;
-        }
-        .pos-display {
-            background: white;
-            color: var(--primary);
-            padding: 50px;
-            border-radius: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-            border: 5px solid var(--gold);
-            max-width: 450px;
-            width: 100%;
-        }
+        :root { --primary: #0f172a; --gold: #b45309; }
+        body { margin: 0; font-family: 'Poppins', sans-serif; background: var(--primary); color: white; display: flex; align-items: center; justify-content: center; height: 100vh; text-align: center; flex-direction: column;}
+        .pos-display { background: white; color: var(--primary); padding: 50px; border-radius: 30px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); border: 5px solid var(--gold); max-width: 450px; width: 100%; }
         h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-top: 0; }
         .amount-display { font-size: 3.5rem; font-weight: 700; color: var(--primary); margin: 10px 0; }
         .order-details { color: #64748b; font-weight: 600; font-size: 1.2rem; margin-bottom: 20px; }
-        
-        #qrcode {
-            margin: 20px auto;
-            display: flex;
-            justify-content: center;
-            padding: 20px;
-            background: white;
-            border-radius: 15px;
-            border: 2px dashed #cbd5e1;
-            min-height: 250px;
-            align-items: center;
-        }
-        
+        #qrcode { margin: 20px auto; display: flex; justify-content: center; padding: 20px; background: white; border-radius: 15px; border: 2px dashed #cbd5e1; min-height: 250px; align-items: center; }
         .waiting-text { color: #94a3b8; font-style: italic; }
         .footer-note { margin-top: 20px; font-weight: 600; color: var(--gold); }
+        .refresh-btn { background: #1e293b; color: white; border: none; padding: 12px 24px; border-radius: 30px; cursor: pointer; font-weight: 600; margin-top: 20px; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .refresh-btn:hover { background: var(--gold); }
     </style>
 </head>
 <body>
@@ -68,8 +36,12 @@
             <span class="waiting-text">QR code will appear here automatically</span>
         </div>
         
-        <div class="footer-note">Scan with your Easy Pay App</div>
+        <div class="footer-note" id="footer-note">Ready for orders</div>
     </div>
+    
+    <button class="refresh-btn" onclick="fetchLatestOrder()">
+        🔄 Refresh Screen
+    </button>
 
     <script>
         // 1. Initialize Firebase 
@@ -77,33 +49,42 @@
             apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
             authDomain: "arabian-nights-cca24.firebaseapp.com",
             databaseURL: "https://arabian-nights-cca24-default-rtdb.firebaseio.com",
-            projectId: "arabian-nights-cca24",
-            storageBucket: "arabian-nights-cca24.firebasestorage.app",
-            messagingSenderId: "405951495752",
-            appId: "1:405951495752:web:cedcf446717f9359b2e27d",
-            measurementId: "G-N6ZC0F2J5V"
+            projectId: "arabian-nights-cca24"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
         let currentQrCode = null;
 
-        // 2. Listen for the most recent order
+        // 2. Real-time Listener
         database.ref('orders').orderByChild('timestamp').limitToLast(1).on('value', (snapshot) => {
             snapshot.forEach((childSnapshot) => {
-                const order = childSnapshot.val();
-                
-                // Only generate QR if the method is "Easy Pay App" and amount > 0
-                if (order.paymentMethod === "Easy Pay App" && order.totalAmount > 0) {
-                    updateDisplay(order);
-                } else if (order.paymentMethod === "Cash") {
-                    // If it's a cash order, clear the QR code and show cash message
-                    showCashMessage(order);
-                }
+                processOrder(childSnapshot.val());
             });
         });
 
-        // 3. Update the screen and generate the Easy Pay Verified Link QR
+        // 3. Manual Refresh Function (Fetches latest order on demand)
+        function fetchLatestOrder() {
+            document.getElementById('footer-note').innerText = "Refreshing...";
+            database.ref('orders').orderByChild('timestamp').limitToLast(1).once('value').then((snapshot) => {
+                snapshot.forEach((childSnapshot) => {
+                    processOrder(childSnapshot.val());
+                    document.getElementById('footer-note').innerText = "Screen Refreshed!";
+                    setTimeout(() => { document.getElementById('footer-note').innerText = "Ready for orders"; }, 2000);
+                });
+            });
+        }
+
+        // 4. Process the order logic
+        function processOrder(order) {
+            if (order.paymentMethod === "Easy Pay QR" && order.totalAmount > 0) {
+                updateDisplay(order);
+            } else if (order.paymentMethod === "Cash") {
+                showCashMessage(order);
+            }
+        }
+
+        // 5. Draw the Easy Pay QR Code
         function updateDisplay(order) {
             document.getElementById('order-details').innerText = `Table ${order.table} | Order #${order.orderNumber}`;
             document.getElementById('display-amount').innerText = `₹${order.totalAmount}`;
@@ -111,28 +92,28 @@
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = ""; 
 
-            // Construct the verified deep link for the Easy Pay App
-            const amount = order.totalAmount;
-            const appLink = `https://easy-pay-app-3f14f.web.app?amount=${amount}&merchant=ArabianNights`;
+            // Create verified deep link containing amount
+            const appLink = `https://easy-pay-app-3f14f.web.app?amount=${order.totalAmount}&merchant=ArabianNights`;
 
-            // Generate the QR Code containing the app link
             currentQrCode = new QRCode(qrContainer, {
                 text: appLink,
-                width: 250,
-                height: 250,
-                colorDark : "#020617",
-                colorLight : "#ffffff",
+                width: 250, height: 250,
+                colorDark : "#020617", colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
             });
+            
+            document.getElementById('footer-note').innerText = "Scan with your Easy Pay App";
         }
 
-        // 4. Handle Cash Orders on the display
+        // 6. Handle Cash UI
         function showCashMessage(order) {
             document.getElementById('order-details').innerText = `Table ${order.table} | Order #${order.orderNumber}`;
             document.getElementById('display-amount').innerText = `₹${order.totalAmount}`;
             
             const qrContainer = document.getElementById("qrcode");
-            qrContainer.innerHTML = `<span class="waiting-text" style="color: #059669; font-weight:bold; font-size:1.5rem;">CASH PAYMENT<br>Collect at Counter</span>`;
+            qrContainer.innerHTML = `<span class="waiting-text" style="color: #059669; font-weight:bold; font-size:1.5rem;">CASH PAYMENT<br>Please pay at the counter</span>`;
+            
+            document.getElementById('footer-note').innerText = "Awaiting Payment";
         }
     </script>
 </body>
