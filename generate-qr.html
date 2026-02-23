@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Restaurant POS | Scan to Pay</title>
+    <title>Counter Display | Scan to Pay</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
@@ -15,7 +15,6 @@
         :root {
             --primary: #0f172a;
             --gold: #b45309;
-            --success: #059669;
         }
         body {
             margin: 0;
@@ -39,7 +38,7 @@
             width: 100%;
         }
         h1 { font-family: 'Playfair Display', serif; color: var(--gold); margin-top: 0; }
-        .amount-display { font-size: 3rem; font-weight: 700; color: var(--primary); margin: 10px 0; }
+        .amount-display { font-size: 3.5rem; font-weight: 700; color: var(--primary); margin: 10px 0; }
         .order-details { color: #64748b; font-weight: 600; font-size: 1.2rem; margin-bottom: 20px; }
         
         #qrcode {
@@ -55,7 +54,7 @@
         }
         
         .waiting-text { color: #94a3b8; font-style: italic; }
-        .footer-note { margin-top: 20px; font-size: 0.85rem; color: #94a3b8; }
+        .footer-note { margin-top: 20px; font-weight: 600; color: var(--gold); }
     </style>
 </head>
 <body>
@@ -69,7 +68,7 @@
             <span class="waiting-text">QR code will appear here automatically</span>
         </div>
         
-        <div class="footer-note">Powered by Easy PayIO Secure Gateway</div>
+        <div class="footer-note">Scan with your Easy Pay App</div>
     </div>
 
     <script>
@@ -94,14 +93,17 @@
             snapshot.forEach((childSnapshot) => {
                 const order = childSnapshot.val();
                 
-                // Only update if it's a QR payment and has an amount
-                if (order.paymentMethod.includes("QR") && order.totalAmount > 0) {
+                // Only generate QR if the method is "Easy Pay App" and amount > 0
+                if (order.paymentMethod === "Easy Pay App" && order.totalAmount > 0) {
                     updateDisplay(order);
+                } else if (order.paymentMethod === "Cash") {
+                    // If it's a cash order, clear the QR code and show cash message
+                    showCashMessage(order);
                 }
             });
         });
 
-        // 3. Update the screen and generate the EasyPayIO link QR
+        // 3. Update the screen and generate the Easy Pay Verified Link QR
         function updateDisplay(order) {
             document.getElementById('order-details').innerText = `Table ${order.table} | Order #${order.orderNumber}`;
             document.getElementById('display-amount').innerText = `₹${order.totalAmount}`;
@@ -109,23 +111,28 @@
             const qrContainer = document.getElementById("qrcode");
             qrContainer.innerHTML = ""; 
 
-            // Construct the unique Easy PayIO URL
-            // This includes the dynamic amount and order ID to make every QR unique
-            const apiKey = "ep_4ya7hmnawmlumyxjn"; // From your easypayio config
+            // Construct the verified deep link for the Easy Pay App
             const amount = order.totalAmount;
-            const orderId = order.id;
-            
-            const paymentString = `https://easy-pay-gateway.web.app?amount=${amount}&orderId=${orderId}&apiKey=${apiKey}`;
+            const appLink = `https://easy-pay-app-3f14f.web.app?amount=${amount}&merchant=ArabianNights`;
 
-            // Generate the QR Code with the Easy PayIO link
+            // Generate the QR Code containing the app link
             currentQrCode = new QRCode(qrContainer, {
-                text: paymentString,
+                text: appLink,
                 width: 250,
                 height: 250,
                 colorDark : "#020617",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
             });
+        }
+
+        // 4. Handle Cash Orders on the display
+        function showCashMessage(order) {
+            document.getElementById('order-details').innerText = `Table ${order.table} | Order #${order.orderNumber}`;
+            document.getElementById('display-amount').innerText = `₹${order.totalAmount}`;
+            
+            const qrContainer = document.getElementById("qrcode");
+            qrContainer.innerHTML = `<span class="waiting-text" style="color: #059669; font-weight:bold; font-size:1.5rem;">CASH PAYMENT<br>Collect at Counter</span>`;
         }
     </script>
 </body>
