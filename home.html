@@ -298,18 +298,16 @@
     // NEW DIRECT APP LINK LOGIC
     // ==========================================
     
-    function payWithEasyPayApp() {
+  function payWithEasyPayApp() {
         const total = document.getElementById('grand-total').innerText.replace('₹', '');
         
-        // 1. First, save the order to Firebase so the kitchen knows it exists
+        // Save the order to Firebase so the generate-qr.html screen can pick it up
         saveOrderToFirebase(total, 'Easy Pay App', 'Pending').then(() => {
+            // Do NOT redirect. Just tell the user to look at the counter display.
+            document.getElementById('success-msg').innerText = `Order Sent to Counter!`;
+            document.getElementById('payment-info').innerHTML = "<strong>Please scan the QR code displayed on the counter screen</strong> using your Easy Pay App to complete your payment.";
             
-            // 2. Build the verified deep link to open the app
-            // We pass the amount and merchant info inside the URL so the app can read it
-            const appLink = `https://easy-pay-app-3f14f.web.app?amount=${total}&merchant=ArabianNights`;
-            
-            // 3. Force the browser to navigate to this link. Android will intercept it.
-            window.location.href = appLink;
+            showPage('success-page');
         });
     }
 
@@ -379,3 +377,4 @@
 </script>
 </body>
 </html>
+
