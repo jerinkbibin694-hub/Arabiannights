@@ -5,14 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARABIAN NIGHTS | The Sultan's Grand Feast</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
-    <!-- Easy PayIO Gateway SDK Integration -->
     <script src="easypayio-gateway.js"></script>
     
-    <!-- QR Code Scanner Library -->
     <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
     
     <style>
@@ -547,13 +544,11 @@
             <button class="close-page-btn" onclick="showPage('menu-page')" title="Close">✕</button>
         </div>
         
-        <!-- Cash Payment Note -->
         <div class="cash-note">
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
         
-        <!-- QR Payment Option -->
         <div class="pay-option selected" onclick="selectPayment(this)" data-method="qr">
             <span class="pay-icon">📱</span>
             <div class="pay-details">
@@ -562,7 +557,6 @@
             </div>
         </div>
         
-        <!-- Cash Option (Pay After Eating) -->
         <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
             <span class="pay-icon">💵</span>
             <div class="pay-details">
@@ -583,7 +577,6 @@
         <button class="btn" style="margin-top: 10px; background: #94a3b8" onclick="showPage('cart-page')">Back to Cart</button>
     </div>
 
-    <!-- New QR Payment Page -->
     <div id="qr-payment-page" class="page">
         <div class="page-header">
             <h2 style="font-family: 'Playfair Display';">Scan Restaurant QR</h2>
@@ -654,8 +647,7 @@
             <button class="close-page-btn" onclick="goBackToRestaurant()" title="Close">✕</button>
         </div>
         <div id="tracking-content">
-            <!-- Tracking content will be dynamically inserted here -->
-        </div>
+            </div>
     </div>
 </div>
 
@@ -935,7 +927,15 @@
             console.log("QR Scanner started with camera:", cameraId);
         }).catch(err => {
             console.error("Unable to start scanning:", err);
-            alert("Unable to access camera. Please ensure camera permissions are granted.");
+            
+            // NEW ERROR HANDLING: Explains why the camera failed on mobile
+            if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+                alert("Camera blocked! You must use HTTPS (a secure link) to access the camera on a phone.");
+            } else if (err.name === 'NotAllowedError') {
+                alert("Camera access was denied. Please check your browser permissions and allow camera access.");
+            } else {
+                alert("Camera Error: " + err.message);
+            }
         });
     }
     
@@ -986,16 +986,16 @@
         document.getElementById('qr-scanned-data').innerText = decodedText;
         document.getElementById('qr-result-area').style.display = 'block';
         
-        // Check if it's a valid UPI QR code
-        if (decodedText.includes('upi://') || decodedText.includes('paytm') || decodedText.includes('phonepe') || decodedText.includes('gpay')) {
+        // UPDATED: Now checks for the Easy PayIO URL instead of UPI
+        if (decodedText.includes('easy-pay-gateway.web.app')) {
             // Valid payment QR code detected
-            alert("✅ Valid payment QR code detected! Redirecting to payment...");
+            alert("✅ Easy PayIO gateway link detected! Redirecting to secure payment...");
             
             // Simulate payment processing
             simulateQrPayment();
         } else {
             // Not a payment QR code
-            if (confirm("This doesn't look like a payment QR code. Do you still want to proceed with payment?")) {
+            if (confirm("This doesn't look like an Easy PayIO code. Do you still want to proceed with payment?")) {
                 simulateQrPayment();
             } else {
                 // Restart scanner
