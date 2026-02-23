@@ -2,6 +2,8 @@
 <html>
 <head>
 <title>Restaurant Table Booking</title>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
 
 <style>
 body {
@@ -15,13 +17,11 @@ body {
     animation: fadeIn 1.5s ease-in-out;
 }
 
-/* Page fade animation */
 @keyframes fadeIn {
     from {opacity:0;}
     to {opacity:1;}
 }
 
-/* Background Video */
 .bg-video{
     position:fixed;
     top:0;
@@ -32,7 +32,6 @@ body {
     z-index:-2;
 }
 
-/* Dark Overlay */
 .overlay{
     position:fixed;
     top:0;
@@ -43,13 +42,13 @@ body {
     z-index:-1;
 }
 
-/* Card Design */
 .card {
     padding:50px;
     border-radius:20px;
     box-shadow:0 10px 70px rgba(0,0,0,0.3);
     width:350px;
-    background:;
+    background: #111;
+    color: white;
     animation: slideUp 1s ease-out;
 }
 
@@ -62,6 +61,7 @@ input, button {
     width:100%;
     padding:10px;
     margin:10px 0;
+    box-sizing: border-box;
 }
 
 button {
@@ -69,12 +69,13 @@ button {
     color:white;
     border:none;
     cursor:pointer;
+    font-weight: bold;
 }
 
 .success{
     display:none;
 }
-/* ABOUT BUTTON STYLE */
+
 .about-btn{
     position:absolute;
     top:25px;
@@ -89,7 +90,6 @@ button {
     transition:0.3s ease;
 }
 
-/* Hover effect */
 .about-btn:hover{
     background:white;
     transform:scale(1.1);
@@ -105,7 +105,6 @@ button {
 
 <div class="overlay"></div>
 
-<!-- Booking Form -->
 <div class="card" id="bookingForm">
 <h2 style="text-align:center;color:yellow;">Book Your Table</h2>
 
@@ -140,13 +139,25 @@ min="1" max="20" required>
 </div>
 
 <script>
+// Initialize Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
+    authDomain: "arabian-nights-cca24.firebaseapp.com",
+    databaseURL: "https://arabian-nights-cca24-default-rtdb.firebaseio.com",
+    projectId: "arabian-nights-cca24",
+    storageBucket: "arabian-nights-cca24.firebasestorage.app",
+    messagingSenderId: "405951495752",
+    appId: "1:405951495752:web:cedcf446717f9359b2e27d",
+    measurementId: "G-N6ZC0F2J5V"
+};
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
 
 // Prevent previous dates
 let today = new Date().toISOString().split("T")[0];
 document.getElementById("date").setAttribute("min", today);
 
 function book(){
-
     let name = document.getElementById("name").value;
     let mobile = document.getElementById("mobile").value;
     let date = document.getElementById("date").value;
@@ -163,35 +174,40 @@ function book(){
         return;
     }
 
-    // Hide booking form
-    document.getElementById("bookingForm").style.display="none";
+    // Save to Firebase instead of localStorage
+    database.ref('bookings').push({
+        name: name,
+        mobile: mobile,
+        date: date,
+        time: time,
+        guests: guests,
+        timestamp: new Date().toISOString()
+    }).then(() => {
+        // Show success page
+        document.getElementById("bookingForm").style.display="none";
+        document.getElementById("successPage").style.display="block";
 
-    // Show success page
-    document.getElementById("successPage").style.display="block";
-
-    // Display details
-    document.getElementById("sname").innerText = name;
-    document.getElementById("smobile").innerText = mobile;
-    document.getElementById("sdate").innerText = date;
-    document.getElementById("stime").innerText = time;
-    document.getElementById("sguests").innerText = guests;
-// Save booking to localStorage
-let bookings = JSON.parse(localStorage.getItem("bookings")) || [];
-
-bookings.push({
-    name: name,
-    mobile: mobile,
-    date: date,
-    time: time,
-    guests: guests
-});
-
-localStorage.setItem("bookings", JSON.stringify(bookings));
+        // Display details
+        document.getElementById("sname").innerText = name;
+        document.getElementById("smobile").innerText = mobile;
+        document.getElementById("sdate").innerText = date;
+        document.getElementById("stime").innerText = time;
+        document.getElementById("sguests").innerText = guests;
+    }).catch(error => {
+        document.getElementById("msg").innerText = "Booking failed. Try again.";
+    });
 }
 
 function goBack(){
     document.getElementById("successPage").style.display="none";
     document.getElementById("bookingForm").style.display="block";
+    
+    // Clear fields
+    document.getElementById("name").value = "";
+    document.getElementById("mobile").value = "";
+    document.getElementById("date").value = "";
+    document.getElementById("time").value = "";
+    document.getElementById("guests").value = "";
 }
 </script>
 
