@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARABIAN NIGHTS | The Sultan's Grand Feast</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
     <script src="easypayio-gateway.js"></script>
+    
+    <script src="https://unpkg.com/html5-qrcode@2.3.8/minified/html5-qrcode.min.js"></script>
     
     <style>
         :root {
@@ -18,9 +21,7 @@
             --glass: rgba(255, 255, 255, 0.98);
             --dark: #020617;
             --success: #059669;
-            --error: #dc2626;
             --info: #3b82f6;
-            --warning: #d97706;
         }
 
         body {
@@ -52,40 +53,10 @@
             position: relative;
         }
 
-        .page-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #f1f5f9;
-        }
+        .page { display: none; padding: 40px; }
+        .active-page { display: block; }
 
-        .page-header h2 { font-family: 'Playfair Display', serif; margin: 0; }
-
-        .close-page-btn {
-            background: var(--primary);
-            color: white;
-            border: none;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-        }
-
-        .close-page-btn:hover { background: var(--gold); transform: scale(1.1); }
-
-        input { width: 100%; padding: 15px; margin: 12px 0; border-radius: 12px; border: 2px solid #e2e8f0; box-sizing: border-box; }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
-        .btn:hover { background: var(--gold); }
-
+        /* Menu Grid Restored */
         .controls { background: var(--dark); padding: 25px; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
         .category-bar { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
         .cat-item { color: #94a3b8; padding: 8px 20px; cursor: pointer; border-radius: 30px; white-space: nowrap; border: 1px solid #1e293b; }
@@ -95,42 +66,26 @@
         .card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9; transition: 0.3s; }
         .card img { width: 100%; height: 180px; object-fit: cover; }
         .card-body { padding: 20px; }
-       
-        .qty-control {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: #f8fafc;
-            border-radius: 12px;
-            border: 1px solid #e2e8f0;
+
+        /* Camera UI */
+        #camera-wrapper {
+            width: 100%;
+            max-width: 400px;
+            margin: 20px auto;
+            border-radius: 20px;
             overflow: hidden;
-            height: 45px;
+            background: #000;
+            display: none;
         }
-        .qty-btn { background: var(--primary); color: white; border: none; width: 40px; height: 100%; cursor: pointer; font-size: 1.2rem; font-weight: bold; }
-        .qty-num { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+
+        .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; margin-top: 10px;}
+        .btn:hover { background: var(--gold); }
+        
+        .qty-control { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; height: 45px; }
+        .qty-btn { background: var(--primary); color: white; border: none; width: 40px; height: 100%; cursor: pointer; font-size: 1.2rem; }
         .add-initial { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; height: 45px; }
 
-        .page { display: none; padding: 40px; }
-        .active-page { display: block; }
-       
-        .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
-
-        .pay-option { display: flex; align-items: center; padding: 20px; border: 2px solid #f1f5f9; border-radius: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
-        .pay-option.selected { border-color: var(--gold); background: #fffcf0; border-width: 3px; }
-        .pay-icon { font-size: 2rem; margin-right: 15px; }
-        .pay-title { font-weight: 700; font-size: 1.2rem; }
-        .pay-description { color: #64748b; font-size: 0.9rem; }
-
-        .tracking-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 20px; }
-        .order-status { background: #fef3c7; color: var(--warning); padding: 8px 16px; border-radius: 30px; font-weight: 600; }
-        .order-status.ready { background: #d1fae5; color: var(--success); }
-        .timer-display { text-align: center; padding: 30px; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 15px; color: white; margin: 20px 0; }
-        .timer { font-size: 4rem; font-weight: 700; color: var(--gold); }
-        .progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin: 20px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--gold); transition: width 0.3s; }
-        
-        .enjoy-card { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 30px; border-radius: 20px; text-align: center; margin: 20px 0; animation: pulse 2s infinite; }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.02); } }
+        .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 1000; }
     </style>
 </head>
 <body>
@@ -144,73 +99,49 @@
     <div id="login-page" class="page active-page" style="text-align: center;">
         <h2 style="font-family: 'Playfair Display';">Marhaban</h2>
         <div style="max-width: 400px; margin: 0 auto;">
-            <input type="text" id="user-name" placeholder="Full Name" required>
-            <input type="number" id="table-number" placeholder="Table Number (1-20)">
+            <input type="text" id="user-name" placeholder="Full Name" style="width:100%; padding:15px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
+            <input type="number" id="table-number" placeholder="Table Number" style="width:100%; padding:15px; margin:10px 0; border-radius:12px; border:1px solid #ddd;">
             <button class="btn" onclick="handleLogin()">Enter Restaurant</button>
         </div>
     </div>
 
     <div id="menu-page" class="page" style="padding:0">
         <div class="controls">
-            <input type="text" id="search" placeholder="Search menu..." oninput="render()">
+            <input type="text" id="search" placeholder="Search menu..." oninput="render()" style="width:100%; padding:12px; border-radius:10px; border:none; background:#1e293b; color:white;">
             <div class="category-bar" id="category-bar"></div>
         </div>
         <div class="menu-grid" id="menu-grid"></div>
     </div>
 
     <div id="cart-page" class="page">
-        <div class="page-header">
-            <h2>Your Order</h2>
-            <button class="close-page-btn" onclick="showPage('menu-page')">✕</button>
+        <h2>Your Order</h2>
+        <div id="cart-items"></div>
+        <hr>
+        <div style="display:flex; justify-content:space-between; font-size:1.5rem; font-weight:700;">
+            <span>Total</span><span id="grand-total">₹0</span>
         </div>
-        <div id="cart-items" style="margin-bottom: 20px;"></div>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 15px;">
-            <div style="display:flex; justify-content:space-between; font-weight:700; font-size:1.5rem;">
-                <span>Total Amount</span><span id="grand-total">₹0</span>
-            </div>
-        </div>
-        <button class="btn" style="margin-top: 25px; background: var(--gold)" onclick="showPage('payment-page')">Proceed to Payment</button>
+        <button class="btn" style="background:var(--gold)" onclick="showPage('payment-page')">Select Payment</button>
     </div>
 
-    <div id="payment-page" class="page">
-        <div class="page-header">
-            <h2>Payment Options</h2>
-            <button class="close-page-btn" onclick="showPage('menu-page')">✕</button>
-        </div>
+    <div id="payment-page" class="page" style="text-align: center;">
+        <h2>Payment</h2>
+        <p>Total Amount: <strong id="pay-amt">₹0</strong></p>
         
-        <div class="pay-option selected" onclick="selectPayment(this)" data-method="qr">
-            <span class="pay-icon">📱</span>
-            <div class="pay-details">
-                <div class="pay-title">Pay at Counter (QR)</div>
-                <div class="pay-description">Scan the QR code displayed at the counter</div>
-            </div>
-        </div>
+        <button class="btn" onclick="toggleCamera()">📸 Open Scanner to Pay</button>
         
-        <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
-            <span class="pay-icon">💵</span>
-            <div class="pay-details">
-                <div class="pay-title">Cash Payment</div>
-                <div class="pay-description">Pay after your meal at the counter</div>
-            </div>
+        <div id="camera-wrapper">
+            <div id="qr-reader"></div>
         </div>
 
-        <button class="btn" style="margin-top: 30px; background: var(--gold)" onclick="processPayment()">Confirm & Place Order</button>
+        <button class="btn" style="background:#64748b" onclick="processCash()">Pay with Cash at Counter</button>
+        <button class="btn" style="background:#94a3b8" onclick="showPage('cart-page')">Back to Cart</button>
     </div>
 
     <div id="success-page" class="page" style="text-align: center;">
         <div style="font-size: 80px; color: var(--success);">✓</div>
-        <h2>Order Placed!</h2>
+        <h2>Order Confirmed!</h2>
         <p id="success-msg"></p>
-        <p id="payment-info" style="background: #f3f4f6; padding: 15px; border-radius: 10px;"></p>
-        <button class="btn" onclick="trackOrder()">📊 Track Order</button>
-    </div>
-
-    <div id="tracking-page" class="page">
-        <div class="page-header">
-            <h2>Track Your Order</h2>
-            <button class="close-page-btn" onclick="goBackToRestaurant()">✕</button>
-        </div>
-        <div id="tracking-content"></div>
+        <button class="btn" onclick="location.reload()">New Order</button>
     </div>
 </div>
 
@@ -232,19 +163,41 @@
     const database = firebase.database();
 
     const menuData = {
-        "Starters": [{id: "s1", name: "Hummus", price: 200, img: "starter1.png"}, {id: "s2", name: "Falafel", price: 100, img: "starter2.jpg"}],
-        "Mains": [{id: "m1", name: "Chicken Mandi", price: 480, img: "main1.jpg"}, {id: "m2", name: "Lamb Kabsa", price: 650, img: "main2.jpeg"}],
-        "Desserts": [{id: "d1", name: "Kunafa", price: 350, img: "dessert1.jpg"}],
-        "Beverages": [{id: "b1", name: "Mint Lemonade", price: 60, img: "drink1.jpg"}]
+        "Starters": [
+            {id: "s1", name: "Hummus", price: 200, img: "starter1.png"},
+            {id: "s2", name: "Falafel", price: 100, img: "starter2.jpg"},
+            {id: "s3", name: "Chicken shawarama", price: 120, img: "starter3.jpg"},
+            {id: "s4", name: "Kibbeh", price: 290, img: "starter4.jpg"},
+        ],
+        "Mains": [
+            { id: "m1", name: "Chicken Mandi", price: 480, img: "main1.jpg" },
+            { id: "m2", name: "Lamb Kabsa", price: 650, img: "main2.jpeg" },
+            { id: "m3", name: "chicken Kabsa", price: 420, img: "main3.jpg" },
+            { id: "m4", name: "Mixed Grill/Platter", price: 590, img: "main4.jpg" },
+            { id: "m5", name: "Machboos", price: 720, img: "main5.jpg" },
+        ],
+        "Desserts": [
+            { id: "d1", name: "Kunafa", price: 350, img: "dessert1.jpg" },
+            { id: "d2", name: "Baklava Mix", price: 290, img: "dessert2.jpg" },
+            { id: "d3", name: "Umm Ali", price: 310, img: "dessert3.jpg" },
+            { id: "d4", name: "Coconut Basbousa", price: 280, img: "dessert4.jpg" },
+            { id: "d5", name: "Qatayef", price: 280, img: "dessert5.jpg" }
+        ],
+        "Beverages": [
+            { id: "b1", name: "Mint Lemonade", price: 60, img: "drink1.jpg" },
+            { id: "b2", name: "Laban", price: 20, img: "drink2.png" },
+            { id: "b3", name: "Rose Milk", price: 60, img: "drink3.jpg" },
+            { id: "b4", name: "Tamarind Juice", price:20, img: "drink4.jpg" },
+            { id: "b5", name: "Karak tea", price: 25, img: "drink5.jpg" }
+        ]
     };
 
-    let cart = {}, currentCat = "Starters", guestInfo = {}, selectedPaymentMethod = "qr", currentOrderId = null, currentOrderRef = null;
+    let cart = {}, currentCat = "Starters", guestInfo = {}, scanner = null;
 
     function handleLogin() {
         const name = document.getElementById('user-name').value;
-        const table = document.getElementById('table-number').value;
-        if(!name) return alert("Please enter your name");
-        guestInfo = { name: name, table: table || "Takeaway" };
+        if(!name) return alert("Enter your name");
+        guestInfo = { name, table: document.getElementById('table-number').value || "Takeaway" };
         initMenu();
         showPage('menu-page');
         document.getElementById('cart-btn').style.display = 'block';
@@ -275,7 +228,7 @@
                     <div class="card-body">
                         <h3>${item.name}</h3>
                         <p>₹${item.price}</p>
-                        ${qty > 0 ? `<div class="qty-control"><button class="qty-btn" onclick="updateQty('${item.id}', -1)">−</button><span class="qty-num">${qty}</span><button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button></div>` : `<button class="add-initial" onclick="updateQty('${item.id}', 1)">ADD</button>`}
+                        ${qty > 0 ? `<div class="qty-control"><button class="qty-btn" onclick="updateQty('${item.id}', -1)">−</button><span>${qty}</span><button class="qty-btn" onclick="updateQty('${item.id}', 1)">+</button></div>` : `<button class="add-initial" onclick="updateQty('${item.id}', 1)">ADD</button>`}
                     </div>
                 </div>`;
         });
@@ -297,52 +250,61 @@
             list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0;"><span>${item.name} x ${cart[id]}</span><span>₹${item.price * cart[id]}</span></div>`;
         });
         document.getElementById('grand-total').innerText = "₹" + total;
+        document.getElementById('pay-amt').innerText = "₹" + total;
         showPage('cart-page');
     }
 
-    function selectPayment(el) {
-        document.querySelectorAll('.pay-option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedPaymentMethod = el.getAttribute('data-method');
+    // New Integrated Camera Function
+    function toggleCamera() {
+        const wrapper = document.getElementById('camera-wrapper');
+        if (wrapper.style.display === 'block') {
+            stopScanner();
+        } else {
+            wrapper.style.display = 'block';
+            scanner = new Html5Qrcode("qr-reader");
+            scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
+                (decodedText) => {
+                    if (decodedText.includes('easy-pay-gateway.web.app')) {
+                        stopScanner();
+                        const total = document.getElementById('grand-total').innerText.replace('₹', '');
+                        saveOrder(total, 'QR Paid');
+                    }
+                }
+            ).catch(err => alert("Camera blocked or not found."));
+        }
     }
 
-    function processPayment() {
-        const total = Object.keys(cart).reduce((sum, id) => sum + (Object.values(menuData).flat().find(i => i.id === id).price * cart[id]), 0);
-        saveOrderToFirebase(total, selectedPaymentMethod);
+    function stopScanner() {
+        if (scanner) scanner.stop().then(() => {
+            document.getElementById('camera-wrapper').style.display = 'none';
+        });
     }
 
-    async function saveOrderToFirebase(total, method) {
+    function processCash() {
+        const total = document.getElementById('grand-total').innerText.replace('₹', '');
+        saveOrder(total, 'Cash');
+    }
+
+    async function saveOrder(total, method) {
         const order = {
             id: Date.now(),
             orderNumber: Math.floor(1000 + Math.random() * 9000),
             name: guestInfo.name, table: guestInfo.table,
-            items: Object.keys(cart).map(id => ({ ...Object.values(menuData).flat().find(i => i.id === id), quantity: cart[id] })),
-            total: "₹" + total, totalAmount: total, status: "Pending",
-            paymentMethod: method === 'qr' ? 'QR Code' : 'Cash',
-            timestamp: new Date().toISOString()
+            items: cart, total: "₹" + total, status: "Pending",
+            paymentMethod: method, timestamp: new Date().toISOString()
         };
         await database.ref('orders/' + order.id).set(order);
-        currentOrderId = order.id; cart = {};
-        document.getElementById('success-msg').innerText = `Order #${order.orderNumber} placed for Table ${guestInfo.table}`;
-        document.getElementById('payment-info').innerText = method === 'qr' ? "Please scan the QR code at the counter to pay." : "Please settle the bill at the counter after your meal.";
+        document.getElementById('success-msg').innerText = `Order #${order.orderNumber} placed! Method: ${method}`;
         showPage('success-page');
+        cart = {};
+        document.getElementById('cart-btn').style.display = 'none';
     }
 
-    function trackOrder() {
-        if (currentOrderRef) currentOrderRef.off();
-        currentOrderRef = database.ref('orders/' + currentOrderId);
-        currentOrderRef.on('value', snap => renderTrackingPage(snap.val()));
-        showPage('tracking-page');
+    function showPage(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
+        document.getElementById(id).classList.add('active-page');
+        if (id !== 'payment-page') stopScanner();
     }
-
-    function renderTrackingPage(order) {
-        const content = document.getElementById('tracking-content');
-        if (!order) return;
-        content.innerHTML = `<div class="tracking-card"><h3>Order #${order.orderNumber}</h3><div class="order-status ${order.status === 'Ready' ? 'ready' : ''}">${order.status}</div><div class="timer-display"><div class="timer">15</div><p>Estimated Minutes Remaining</p></div><div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div></div>`;
-    }
-
-    function goBackToRestaurant() { if (currentOrderRef) currentOrderRef.off(); showPage('menu-page'); }
-    function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page')); document.getElementById(id).classList.add('active-page'); }
 </script>
 </body>
 </html>
