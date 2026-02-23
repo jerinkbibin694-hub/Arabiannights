@@ -249,6 +249,7 @@
         selectedPaymentMethod = el.getAttribute('data-method');
     }
 
+    // --- REPLACED FUNCTION ---
     function placeFinalOrder() {
         const total = document.getElementById('grand-total').innerText.replace('₹', '');
         
@@ -262,20 +263,23 @@
         };
         
         database.ref('orders/' + order.id).set(order).then(() => {
-            currentOrderId = order.id; cart = {};
+            currentOrderId = order.id; 
+            
+            // Clear cart
+            cart = {};
             document.getElementById('count').innerText = "0";
             document.getElementById('cart-btn').style.display = 'none';
             
-            document.getElementById('success-msg').innerText = `Order #${order.orderNumber} placed for Table ${guestInfo.table}!`;
-            
-            // Instruction switch based on selection
             if (selectedPaymentMethod === "Easy Pay QR") {
-                document.getElementById('payment-info').innerHTML = "<strong>Please look at the counter screen and scan the secure Easy Pay QR code</strong> to complete your payment.";
+                // Redirect to the new separate payment gateway page
+                const paymentUrl = `payment-gateway.html?amount=${total}&orderId=${order.orderNumber}`;
+                window.location.href = paymentUrl; 
             } else {
+                // Cash Payment - Show old success page logic
+                document.getElementById('success-msg').innerText = `Order #${order.orderNumber} placed for Table ${guestInfo.table}!`;
                 document.getElementById('payment-info').innerHTML = "Please settle the bill at the counter using Cash.";
+                showPage('success-page');
             }
-            
-            showPage('success-page');
         });
     }
 
