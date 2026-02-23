@@ -254,32 +254,64 @@
         showPage('cart-page');
     }
 
-    // New Integrated Camera Function
+    // Upgraded Camera Functions
     function toggleCamera() {
         const wrapper = document.getElementById('camera-wrapper');
+        
+        // If it's already open, close it
         if (wrapper.style.display === 'block') {
             stopScanner();
-        } else {
-            wrapper.style.display = 'block';
-            scanner = new Html5Qrcode("qr-reader");
-            scanner.start({ facingMode: "environment" }, { fps: 10, qrbox: 250 }, 
-                (decodedText) => {
-                    if (decodedText.includes('easy-pay-gateway.web.app')) {
-                        stopScanner();
-                        const total = document.getElementById('grand-total').innerText.replace('₹', '');
-                        saveOrder(total, 'QR Paid');
-                    }
-                }
-            ).catch(err => alert("Camera blocked or not found."));
+            return;
         }
-    }
+        
+        // Show the wrapper first so the camera has a physical space to load into
+        wrapper.style.display = 'block';
+        
+        // Only create the scanner instance if it doesn't exist yet
+        if (!scanner) {
+            scanner = new Html5Qrcode("qr-reader");
+        }
 
-    function stopScanner() {
-        if (scanner) scanner.stop().then(() => {
-            document.getElementById('camera-wrapper').style.display = 'none';
+        // Start the camera
+        scanner.start(
+            { facingMode: "environment" }, // Forces the back camera
+            { fps: 10, qrbox: { width: 250, height: 250 } }, 
+            (decodedText) => {
+                // SUCCESS: What happens when it sees the QR code
+                if (decodedText.includes('easy-pay-gateway.web.app')) {
+                    stopScanner();
+                    const total = document.getElementById('grand-total').innerText.replace('₹', '');
+                    saveOrder(total, 'QR Paid');
+                }
+            },
+            (errorMessage) => {
+                // ERROR CALLBACK: Left empty on purpose. 
+                // The scanner checks frames 10 times a second. If it doesn't see a QR code, 
+                // it throws a silent error. We must catch it here so it doesn't crash the app.
+            }
+        ).catch(err => {
+            console.error("Camera Initialization Error:", err);
+            wrapper.style.display = 'none'; // Hide the black box if it fails
+            
+            // Pop-up to tell you exactly WHY it failed
+            if (window.location.protocol !== "https:" && window.location.hostname !== "localhost") {
+                alert("⚠️ CAMERA BLOCKED: Phones require a secure 'https://' link to open the camera. You cannot use a standard 'http://' IP address.");
+            } else {
+                alert("⚠️ CAMERA DENIED: Please check your browser permissions and allow camera access for this site.");
+            }
         });
     }
 
+    function stopScanner() {
+        if (scanner) {
+            scanner.stop().then(() => {
+                document.getElementById('camera-wrapper').style.display = 'none';
+            }).catch(err => {
+                console.error("Error stopping scanner:", err);
+                document.getElementById('camera-wrapper').style.display = 'none';
+            });
+        }
+    }
     function processCash() {
         const total = document.getElementById('grand-total').innerText.replace('₹', '');
         saveOrder(total, 'Cash');
@@ -308,3 +340,4 @@
 </script>
 </body>
 </html>
+
