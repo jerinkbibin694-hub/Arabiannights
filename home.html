@@ -9,8 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
-    <script src="easypayio-gateway.js"></script>
-    
     <style>
         :root {
             --primary: #0f172a;
@@ -85,7 +83,7 @@
 
         input { width: 100%; padding: 15px; margin: 12px 0; border-radius: 12px; border: 2px solid #e2e8f0; box-sizing: border-box; }
         .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; margin-top: 10px;}
-        .btn:hover { background: var(--gold); }
+        .btn:hover { background: var(--gold); transform: scale(0.98); }
 
         .controls { background: var(--dark); padding: 25px; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
         .category-bar { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
@@ -107,19 +105,9 @@
        
         .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
-        .pay-option { display: flex; align-items: center; padding: 20px; border: 2px solid #f1f5f9; border-radius: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
-        .pay-option.selected { border-color: var(--gold); background: #fffcf0; border-width: 3px; }
-        .pay-icon { font-size: 2rem; margin-right: 15px; }
-        .pay-title { font-weight: 700; font-size: 1.2rem; }
-        .pay-description { color: #64748b; font-size: 0.9rem; }
-
         .tracking-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 20px; }
-        .order-status { background: #fef3c7; color: var(--warning); padding: 8px 16px; border-radius: 30px; font-weight: 600; }
+        .order-status { background: #fef3c7; color: var(--warning); padding: 8px 16px; border-radius: 30px; font-weight: 600; display: inline-block;}
         .order-status.ready { background: #d1fae5; color: var(--success); }
-        .timer-display { text-align: center; padding: 30px; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 15px; color: white; margin: 20px 0; }
-        .timer { font-size: 4rem; font-weight: 700; color: var(--gold); }
-        .progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin: 20px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--gold); transition: width 0.3s; }
     </style>
 </head>
 <body>
@@ -131,11 +119,11 @@
 
 <div class="container">
     <div id="login-page" class="page active-page" style="text-align: center;">
-        <h2 style="font-family: 'Playfair Display';">Marhaban</h2>
+        <h2 style="font-family: 'Playfair Display'; font-size: 2.5rem;">Marhaban</h2>
         <div style="max-width: 400px; margin: 0 auto;">
             <input type="text" id="user-name" placeholder="Full Name" required>
-            <input type="number" id="table-number" placeholder="Table Number">
-            <button class="btn" onclick="handleLogin()">Enter Restaurant</button>
+            <input type="number" id="table-number" placeholder="Table Number (1-20)">
+            <button class="btn" style="margin-top: 20px;" onclick="handleLogin()">Enter Restaurant</button>
         </div>
     </div>
 
@@ -158,32 +146,26 @@
                 <span>Total Amount</span><span id="grand-total">₹0</span>
             </div>
         </div>
-        <button class="btn" style="margin-top: 25px; background: var(--gold)" onclick="showPage('payment-page')">Select Payment</button>
+        <button class="btn" style="margin-top: 25px; background: var(--gold)" onclick="showPage('payment-page')">Proceed to Payment</button>
     </div>
 
-    <div id="payment-page" class="page">
-        <div class="page-header">
-            <h2>Payment</h2>
-            <button class="close-page-btn" onclick="showPage('cart-page')">✕</button>
-        </div>
+    <div id="payment-page" class="page" style="text-align: center;">
+        <h2 style="font-family: 'Poppins', sans-serif; color: #1e293b; font-weight: 700; font-size: 2rem;">Payment</h2>
+        <p style="font-size: 1.2rem; color: #64748b; margin-bottom: 40px;">Total Amount: <strong id="pay-amt" style="color: #1e293b;">₹0</strong></p>
         
-        <div class="pay-option selected" onclick="selectPayment(this)" data-method="online">
-            <span class="pay-icon">💳</span>
-            <div class="pay-details">
-                <div class="pay-title">Pay Online Now</div>
-                <div class="pay-description">Securely via Easy PayIO (UPI, Cards, Wallets)</div>
-            </div>
+        <div style="max-width: 400px; margin: 0 auto;">
+            <button class="btn" style="background: var(--gold); padding: 16px; font-size: 1.1rem; border-radius: 12px; margin-bottom: 15px;" onclick="payWithEasyPayApp()">
+                💳 Open Easy Pay App
+            </button>
+            
+            <button class="btn" style="background: #64748b; padding: 16px; font-size: 1.1rem; border-radius: 12px; margin-bottom: 15px;" onclick="processCash()">
+                Pay with Cash at Counter
+            </button>
+            
+            <button class="btn" style="background: #94a3b8; padding: 16px; font-size: 1.1rem; border-radius: 12px;" onclick="showPage('cart-page')">
+                Back to Cart
+            </button>
         </div>
-        
-        <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
-            <span class="pay-icon">💵</span>
-            <div class="pay-details">
-                <div class="pay-title">Cash Payment</div>
-                <div class="pay-description">Pay after your meal at the counter</div>
-            </div>
-        </div>
-
-        <button class="btn" style="margin-top: 30px; background: var(--gold)" onclick="processPayment()">Place Order</button>
     </div>
 
     <div id="success-page" class="page" style="text-align: center;">
@@ -191,7 +173,7 @@
         <h2>Order Confirmed!</h2>
         <p id="success-msg"></p>
         <p id="payment-info" style="background: #f3f4f6; padding: 15px; border-radius: 10px;"></p>
-        <button class="btn" onclick="trackOrder()">📊 Track Order</button>
+        <button class="btn" style="max-width: 200px; margin-top:30px;" onclick="trackOrder()">📊 Track Order</button>
     </div>
 
     <div id="tracking-page" class="page">
@@ -250,7 +232,7 @@
         ]
     };
 
-    let cart = {}, currentCat = "Starters", guestInfo = {}, selectedPaymentMethod = "online", currentOrderId = null, currentOrderRef = null;
+    let cart = {}, currentCat = "Starters", guestInfo = {}, currentOrderId = null, currentOrderRef = null;
 
     function handleLogin() {
         const name = document.getElementById('user-name').value;
@@ -308,63 +290,68 @@
             list.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0;"><span>${item.name} x ${cart[id]}</span><span>₹${item.price * cart[id]}</span></div>`;
         });
         document.getElementById('grand-total').innerText = "₹" + total;
+        document.getElementById('pay-amt').innerText = "₹" + total;
         showPage('cart-page');
     }
 
-    function selectPayment(el) {
-        document.querySelectorAll('.pay-option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        selectedPaymentMethod = el.getAttribute('data-method');
-    }
-
-    // DIRECT EASY PAYIO INTEGRATION
-    function processPayment() {
+    // ==========================================
+    // NEW DIRECT APP LINK LOGIC
+    // ==========================================
+    
+    function payWithEasyPayApp() {
         const total = document.getElementById('grand-total').innerText.replace('₹', '');
         
-        if (selectedPaymentMethod === "online") {
-            // Trigger the Easy PayIO SDK Gateway
-            EasyPayIO.pay({
-                amount: parseFloat(total),
-                productName: "Arabian Nights Dine-in Order",
-                userEmail: guestInfo.name, // Passing the guest's name for receipt
-                onSuccess: function(response) {
-                    console.log("Payment Success!", response);
-                    // Payment worked! Save the order as Paid.
-                    saveOrderToFirebase(total, 'Online via EasyPayIO', 'Paid');
-                },
-                onFailure: function(error) {
-                    console.error("Payment Failed", error);
-                    alert("Payment cancelled or failed. Please try again.");
-                }
-            });
+        // 1. First, save the order to Firebase so the kitchen knows it exists
+        saveOrderToFirebase(total, 'Easy Pay App', 'Pending').then(() => {
             
-        } else if (selectedPaymentMethod === "cash") {
-            // Cash flow
-            saveOrderToFirebase(total, 'Cash', 'Pending');
-        }
+            // 2. Build the verified deep link to open the app
+            // We pass the amount and merchant info inside the URL so the app can read it
+            const appLink = `https://easy-pay-app-3f14f.web.app?amount=${total}&merchant=ArabianNights`;
+            
+            // 3. Force the browser to navigate to this link. Android will intercept it.
+            window.location.href = appLink;
+        });
     }
 
-    async function saveOrderToFirebase(total, method, paymentStatus) {
-        const order = {
-            id: Date.now(),
-            orderNumber: Math.floor(1000 + Math.random() * 9000),
-            name: guestInfo.name, table: guestInfo.table,
-            items: Object.keys(cart).map(id => ({ ...Object.values(menuData).flat().find(i => i.id === id), quantity: cart[id] })),
-            total: "₹" + total, totalAmount: total, status: "Pending",
-            paymentMethod: method,
-            paymentStatus: paymentStatus,
-            timestamp: new Date().toISOString()
-        };
-        await database.ref('orders/' + order.id).set(order);
-        
-        currentOrderId = order.id; cart = {};
-        document.getElementById('count').innerText = "0";
-        document.getElementById('success-msg').innerText = `Order #${order.orderNumber} for Table ${guestInfo.table} placed!`;
-        document.getElementById('payment-info').innerText = method === 'Cash' ? "Please settle the bill at the counter after eating." : "✅ Payment Successful! Your food is being prepared.";
-        
-        showPage('success-page');
-        document.getElementById('cart-btn').style.display = 'none';
+    function processCash() {
+        const total = document.getElementById('grand-total').innerText.replace('₹', '');
+        saveOrderToFirebase(total, 'Cash', 'Pending');
     }
+
+    // Returns a Promise so we can wait for Firebase to finish saving before redirecting
+    function saveOrderToFirebase(total, method, paymentStatus) {
+        return new Promise((resolve) => {
+            const order = {
+                id: Date.now(),
+                orderNumber: Math.floor(1000 + Math.random() * 9000),
+                name: guestInfo.name, table: guestInfo.table,
+                items: Object.keys(cart).map(id => ({ ...Object.values(menuData).flat().find(i => i.id === id), quantity: cart[id] })),
+                total: "₹" + total, totalAmount: total, status: "Pending",
+                paymentMethod: method,
+                paymentStatus: paymentStatus,
+                timestamp: new Date().toISOString()
+            };
+            
+            database.ref('orders/' + order.id).set(order).then(() => {
+                currentOrderId = order.id; 
+                cart = {};
+                document.getElementById('count').innerText = "0";
+                document.getElementById('cart-btn').style.display = 'none';
+                
+                // If it's cash, immediately show success page.
+                // If it's the app, we let the resolve() handle the redirect instead of changing pages.
+                if (method === 'Cash') {
+                    document.getElementById('success-msg').innerText = `Order #${order.orderNumber} placed!`;
+                    document.getElementById('payment-info').innerText = "Please settle the bill at the counter after eating.";
+                    showPage('success-page');
+                }
+                
+                resolve(); // Signals that saving is complete
+            });
+        });
+    }
+
+    // ==========================================
 
     function trackOrder() {
         if (currentOrderRef) currentOrderRef.off();
@@ -376,7 +363,15 @@
     function renderTrackingPage(order) {
         const content = document.getElementById('tracking-content');
         if (!order) return;
-        content.innerHTML = `<div class="tracking-card"><h3>Order #${order.orderNumber}</h3><div class="order-status ${order.status === 'Ready' ? 'ready' : ''}">${order.status}</div><div class="timer-display"><div class="timer">15</div><p>Estimated Minutes Remaining</p></div><div class="progress-bar"><div class="progress-fill" style="width: 20%"></div></div></div>`;
+        content.innerHTML = `
+            <div class="tracking-card">
+                <h3>Order #${order.orderNumber}</h3>
+                <div class="order-status">${order.status}</div>
+                <div style="margin-top: 20px;">
+                    <strong>Total:</strong> ${order.total} <br>
+                    <strong>Payment:</strong> ${order.paymentMethod}
+                </div>
+            </div>`;
     }
 
     function goBackToRestaurant() { if (currentOrderRef) currentOrderRef.off(); showPage('menu-page'); }
