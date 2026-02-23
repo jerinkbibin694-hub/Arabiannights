@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant POS | Scan to Pay</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <style>
+        :root {
+            --primary: #0f172a;
+            --gold: #b45309;
+        }
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            background: var(--primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .pos-display {
+            background: white;
+            color: var(--primary);
+            padding: 50px;
+            border-radius: 30px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            border: 5px solid var(--gold);
+            max-width: 400px;
+            width: 100%;
+        }
+        h1 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            margin-top: 0;
+            font-size: 2.2rem;
+        }
+        p {
+            color: #64748b;
+            font-weight: 600;
+        }
+        #qrcode {
+            margin: 30px auto;
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            border: 2px dashed #cbd5e1;
+        }
+        .footer-note {
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="pos-display">
+        <h1>Arabian Nights</h1>
+        <p>Scan this QR code with your phone to complete your payment.</p>
+        
+        <div id="qrcode"></div>
+        
+        <div class="footer-note">Accepted: UPI, Google Pay, PhonePe, Paytm</div>
+    </div>
+
+    <script>
+        // This is a standard UPI string format. 
+        // Because it includes "upi://", your home.html scanner will mark it as valid.
+        const paymentString = "upi://pay?pa=arabiannights@easypayio&pn=Arabian%20Nights&cu=INR";
+
+        // Generate the QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: paymentString,
+            width: 250,
+            height: 250,
+            colorDark : "#020617", // Dark blue/black color for the QR code
+            colorLight : "#ffffff", // White background
+            correctLevel : QRCode.CorrectLevel.H
+        });
+    </script>
+
+</body>
+</html>
