@@ -5,9 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARABIAN NIGHTS | The Sultan's Grand Feast</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    
+    <script src="https://checkout.stripe.com/checkout.js"></script>
+
     <style>
         :root {
             --primary: #0f172a;
@@ -415,22 +418,19 @@
             <button class="close-page-btn" onclick="showPage('menu-page')" title="Close">✕</button>
         </div>
         
-        <!-- Cash Payment Note -->
         <div class="cash-note">
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
         
-        <!-- UPI Option -->
-        <div class="pay-option selected" onclick="selectPayment(this)" data-method="upi">
-            <span class="pay-icon">📱</span>
+        <div class="pay-option selected" onclick="selectPayment(this)" data-method="stripe">
+            <span class="pay-icon">💳</span>
             <div class="pay-details">
-                <div class="pay-title">UPI Payment</div>
-                <div class="pay-description">Pay now using Google Pay, PhonePe, or any UPI app</div>
+                <div class="pay-title">Pay with Card</div>
+                <div class="pay-description">Pay securely online using Stripe</div>
             </div>
         </div>
         
-        <!-- Cash Option (Pay After Eating) -->
         <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
             <span class="pay-icon">💵</span>
             <div class="pay-details">
@@ -468,8 +468,7 @@
             <button class="close-page-btn" onclick="goBackToRestaurant()" title="Close">✕</button>
         </div>
         <div id="tracking-content">
-            <!-- Tracking content will be dynamically inserted here -->
-        </div>
+            </div>
     </div>
 </div>
 
@@ -491,6 +490,17 @@
     // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
+
+    // Initialize the Stripe Popup
+    const stripeHandler = StripeCheckout.configure({
+        key: 'pk_test_51T4HgPRpK1q9MAVYcu2dR2Bol5eERnXSiCVgIoSOrMFlvrKUK5UKTNhWwh6Vi0CgKQvPmWGWQTGrRnbc5fkhN6Cn00qu85tPjV',
+        locale: 'en',
+        currency: 'inr',
+        token: function(token) {
+            // This function runs ONLY when the dummy card payment is successful
+            finalizeOrder("Card (Paid via Stripe)", "Paid");
+        }
+    });
 
     const menuData = {
         "Starters": [
@@ -519,14 +529,13 @@
             { id: "b3", name: "Rose Milk", price: 160, img: "drink3.jpg" },
             { id: "b4", name: "Tamarind Juice", price: 140, img: "drink4.jpg" },
             { id: "b5", name: "Karak tea", price: 140, img: "drink5.jpg" }
-            
         ]
     };
 
     let cart = {};
     let currentCat = "Starters";
     let guestInfo = {};
-    let selectedPaymentMethod = "upi";
+    let selectedPaymentMethod = "stripe"; // Changed default to stripe
     let currentOrderId = null;
     let trackingInterval = null;
     let currentOrderRef = null;
@@ -537,7 +546,6 @@
         
         if(!name) return alert("Please enter your name");
         
-        // Validate table number if provided
         if (table) {
             const tableNum = parseInt(table);
             if (tableNum < 1 || tableNum > 20) {
@@ -574,7 +582,6 @@
         
         grid.innerHTML = "";
         
-        // Filter items based on search
         let itemsToShow = menuData[currentCat];
         if (searchTerm) {
             itemsToShow = itemsToShow.filter(item => 
@@ -614,11 +621,10 @@
         if (newQty <= 0) delete cart[id];
         else cart[id] = newQty;
 
-        // Update total count
         const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
         document.getElementById('count').innerText = totalItems;
        
-        render(); // Refresh the list to show new buttons
+        render();
     }
 
     function showCart() {
@@ -653,7 +659,6 @@
             alert("Your cart is empty!");
             return;
         }
-        
         showPage('payment-page');
     }
 
@@ -663,13 +668,33 @@
         selectedPaymentMethod = el.getAttribute('data-method');
     }
 
-    async function processPayment() {
+    function processPayment() {
         if (Object.keys(cart).length === 0) {
             alert("Your cart is empty!");
             return;
         }
-        
-        // Create order object
+
+        // Calculate total amount quickly for Stripe
+        let total = 0;
+        Object.keys(cart).forEach(id => {
+            const item = Object.values(menuData).flat().find(i => i.id === id);
+            total += (item.price * cart[id]);
+        });
+
+        if (selectedPaymentMethod === "stripe") {
+            // Open the Stripe Popup
+            stripeHandler.open({
+                name: 'ARABIAN NIGHTS',
+                description: 'Order for Table: ' + guestInfo.table,
+                amount: total * 100 // Stripe requires the amount in paise
+            });
+        } else {
+            // If Cash is selected, skip Stripe and save order immediately
+            finalizeOrder("Cash (Pay After Eating)", "Pending");
+        }
+    }
+
+    async function finalizeOrder(paymentMethodText, paymentStatusText) {
         const orderItems = [];
         Object.keys(cart).forEach(id => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
@@ -679,55 +704,44 @@
                 price: item.price,
                 quantity: cart[id],
                 category: Object.keys(menuData).find(cat => menuData[cat].some(i => i.id === id)),
-                time: "Not Set" // Staff will set this
+                time: "Not Set" 
             });
         });
 
-        // Calculate total
         const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
 
-        // Create order with payment method and tracking info
         const order = {
             id: Date.now(),
-            orderNumber: Math.floor(1000 + Math.random() * 9000), // Random 4-digit order number
+            orderNumber: Math.floor(1000 + Math.random() * 9000), 
             name: guestInfo.name,
             table: guestInfo.table,
             items: orderItems,
-            itemStatus: {}, // Will track per-item status
+            itemStatus: {}, 
             total: "₹" + total,
             totalAmount: total,
             status: "Pending",
-            paymentMethod: selectedPaymentMethod === "upi" ? "UPI (Paid Online)" : "Cash (Pay After Eating)",
-            paymentStatus: selectedPaymentMethod === "upi" ? "Paid" : "Pending",
+            paymentMethod: paymentMethodText,
+            paymentStatus: paymentStatusText,
             timestamp: new Date().toISOString(),
-            estimatedTime: null, // Will be set by staff
-            preparationTime: null, // Staff will add this
+            estimatedTime: null, 
+            preparationTime: null, 
             notified: false
         };
 
-        // Initialize item status
         order.items.forEach(item => {
             order.itemStatus[item.id] = 'pending';
         });
 
         try {
-            // Save to Firebase Realtime Database
             await database.ref('orders/' + order.id).set(order);
-            
-            // Store current order ID
             currentOrderId = order.id;
 
-            // Clear cart
             cart = {};
             document.getElementById('count').innerText = "0";
 
-            // Show success message with payment info
-            let paymentMessage = "";
-            if (selectedPaymentMethod === "upi") {
-                paymentMessage = "✅ Payment successful via UPI. Your food will be served shortly!";
-            } else {
-                paymentMessage = "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
-            }
+            let paymentMessage = paymentStatusText === "Paid" 
+                ? "✅ Payment successful. Your food will be served shortly!" 
+                : "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
             
             document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
             document.getElementById('payment-info').innerHTML = paymentMessage;
@@ -751,9 +765,8 @@
             return;
         }
 
-        // Set up real-time listener for this order
         if (currentOrderRef) {
-            currentOrderRef.off(); // Remove previous listener
+            currentOrderRef.off(); 
         }
 
         currentOrderRef = database.ref('orders/' + currentOrderId);
@@ -773,7 +786,6 @@
     function renderTrackingPage(order) {
         const content = document.getElementById('tracking-content');
         
-        // Calculate ready items count
         let readyItems = 0;
         if (order.itemStatus) {
             readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
@@ -781,10 +793,8 @@
         const totalItems = order.items.length;
         const allReady = readyItems === totalItems && totalItems > 0;
         
-        // Calculate progress based on ready items
         let progressWidth = totalItems > 0 ? (readyItems / totalItems) * 100 : 0;
         
-        // Determine status class and text
         let statusClass = "order-status";
         let statusText = order.status;
         
@@ -800,11 +810,9 @@
             statusClass += " pending";
         }
         
-        // Check if all items have times set
         const itemsWithTimes = order.items.filter(item => item.time && item.time !== "Not Set");
         const allTimesSet = itemsWithTimes.length === totalItems;
         
-        // Calculate estimated time if available
         let timeDisplay = "";
         if (order.estimatedTime) {
             timeDisplay = `
@@ -815,7 +823,6 @@
                 </div>
             `;
         } else if (allTimesSet) {
-            // Calculate max time from items
             const maxTime = Math.max(...itemsWithTimes.map(item => parseInt(item.time) || 0));
             if (maxTime > 0) {
                 timeDisplay = `
@@ -836,7 +843,6 @@
             `;
         }
         
-        // Build items list with times
         let itemsHtml = "";
         order.items.forEach(item => {
             const itemStatus = order.itemStatus ? order.itemStatus[item.id] : 'pending';
@@ -855,7 +861,6 @@
             `;
         });
         
-        // Show ENJOY YOUR FOOD card if all items are ready
         let enjoyCard = "";
         if (allReady) {
             enjoyCard = `
@@ -913,7 +918,6 @@
     }
 
     function refreshTracking() {
-        // No need to manually refresh as Firebase real-time listener handles it
         if (currentOrderRef) {
             currentOrderRef.once('value', (snapshot) => {
                 const order = snapshot.val();
@@ -930,7 +934,6 @@
             trackingInterval = null;
         }
         
-        // Remove Firebase listener
         if (currentOrderRef) {
             currentOrderRef.off();
             currentOrderRef = null;
@@ -945,7 +948,6 @@
         document.getElementById(id).classList.add('active-page');
         window.scrollTo(0,0);
         
-        // Clear tracking interval if leaving tracking page
         if (id !== 'tracking-page' && trackingInterval) {
             clearInterval(trackingInterval);
             trackingInterval = null;
