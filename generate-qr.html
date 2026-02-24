@@ -3,68 +3,125 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Easy Pay | Secure Checkout</title>
+    <title>EasyPay Secure Checkout</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-        body { font-family: 'Poppins', sans-serif; background: #020617; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; color: #fff; }
-        .payment-container { background: #fff; color: #1e293b; padding: 40px; border-radius: 30px; box-shadow: 0 20px 40px rgba(0,0,0,0.4); text-align: center; max-width: 400px; width: 90%; }
-        .logo { font-weight: 700; color: #b45309; font-size: 1.5rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 2px; }
-        .amount-box { background: #f8fafc; padding: 20px; border-radius: 20px; margin-bottom: 25px; border: 1px solid #e2e8f0; }
-        .amount-label { font-size: 0.9rem; color: #64748b; }
-        .amount-value { font-size: 2.2rem; font-weight: 700; color: #0f172a; }
-        #qrcode { display: flex; justify-content: center; margin: 25px 0; padding: 15px; background: white; border-radius: 15px; }
-        .order-ref { font-size: 0.85rem; color: #94a3b8; margin-top: 10px; }
-        .btn-confirm { background: #059669; color: white; border: none; padding: 16px; border-radius: 15px; width: 100%; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.3s; margin-top: 20px; }
-        .btn-confirm:hover { background: #047857; transform: scale(1.02); }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #f8fafc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            color: #0f172a;
+        }
+        .qr-card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 350px;
+            width: 100%;
+        }
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: #b45309; /* Arabian Nights Gold */
+            margin-bottom: 20px;
+        }
+        #amount-display {
+            font-size: 2rem;
+            font-weight: 600;
+            color: #059669;
+            margin: 15px 0;
+        }
+        #qrcode {
+            margin: 20px auto;
+            padding: 15px;
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 10px;
+            display: inline-block;
+        }
+        .instructions {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 25px;
+        }
+        .simulate-btn {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .simulate-btn:hover {
+            background: #b45309;
+        }
     </style>
 </head>
 <body>
 
-<div class="payment-container">
-    <div class="logo">Easy Pay Gateway</div>
-    <p style="margin-bottom: 25px;">Scan to complete your payment for <strong>Arabian Nights</strong></p>
-    
-    <div class="amount-box">
-        <div class="amount-label">Total Payable Amount</div>
-        <div class="amount-value" id="display-amount">₹0</div>
+    <div class="qr-card">
+        <div class="logo">EasyPay Gateway</div>
+        <div>Total Amount to Pay</div>
+        <div id="amount-display">₹0</div>
+        
+        <div id="qrcode"></div>
+        
+        <div class="instructions">
+            Open the <b>EasyPay App</b> on your phone and scan this QR code to complete your payment.
+        </div>
+
+        <button class="simulate-btn" onclick="sendSuccessMessage()">
+            Simulate App Scan Success
+        </button>
     </div>
 
-    <div id="qrcode"></div>
-    
-    <div class="order-ref">Order Ref: <span id="display-order-id">#0000</span></div>
-    
-    <button class="btn-confirm" onclick="completePayment()">I Have Paid</button>
-</div>
+    <script>
+        // 1. Get the amount from the URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const amount = urlParams.get('amount') || '0';
+        
+        document.getElementById('amount-display').innerText = '₹' + amount;
 
-<script>
-    // Get Order Details from URL Parameters
-    const params = new URLSearchParams(window.location.search);
-    const amount = params.get('amt') || '0';
-    const orderNo = params.get('ref') || '0000';
-    const orderId = params.get('id'); // Firebase ID
+        // 2. Generate the QR Code Data
+        // You can format this JSON however your easy-pay-app-3f14f.web.app expects it
+        const qrData = JSON.stringify({
+            gateway: "EasyPay",
+            merchant: "Arabian Nights",
+            amount: amount,
+            currency: "INR",
+            timestamp: Date.now()
+        });
 
-    document.getElementById('display-amount').innerText = "₹" + amount;
-    document.getElementById('display-order-id').innerText = "#" + orderNo;
+        // 3. Render the QR Code
+        new QRCode(document.getElementById("qrcode"), {
+            text: qrData,
+            width: 200,
+            height: 200,
+            colorDark : "#0f172a",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
+        });
 
-    // Generate UPI QR Code (Standard UPI Deep-link)
-    // Replace 'yourname@upi' with your actual UPI ID
-    const upiData = `upi://pay?pa=yourname@upi&pn=ArabianNights&am=${amount}&cu=INR&tn=Order${orderNo}`;
-
-    new QRCode(document.getElementById("qrcode"), {
-        text: upiData,
-        width: 220,
-        height: 220,
-        colorDark : "#0f172a",
-        colorLight : "#ffffff",
-        correctLevel : QRCode.CorrectLevel.H
-    });
-
-    function completePayment() {
-        // Redirect back to home.html with the order ID so they can track it
-        window.location.href = `home.html?orderId=${orderId}&paid=true`;
-    }
-</script>
-
+        // 4. Function to communicate back to the main website
+        function sendSuccessMessage() {
+            // Send the required PAYMENT_SUCCESS message to the parent window (home.html)
+            if (window.opener) {
+                window.opener.postMessage({ type: 'PAYMENT_SUCCESS', amount: amount }, '*');
+            } else {
+                alert("Payment successful! You can close this window.");
+            }
+        }
+    </script>
 </body>
 </html>
