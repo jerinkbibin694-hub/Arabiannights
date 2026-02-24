@@ -34,10 +34,10 @@
             margin-bottom: 20px;
         }
         #amount-display {
-            font-size: 2rem;
-            font-weight: 600;
+            font-size: 2.5rem;
+            font-weight: 700;
             color: #059669;
-            margin: 15px 0;
+            margin: 10px 0;
         }
         #qrcode {
             margin: 20px auto;
@@ -48,9 +48,10 @@
             display: inline-block;
         }
         .instructions {
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             color: #64748b;
             margin-bottom: 25px;
+            line-height: 1.5;
         }
         .simulate-btn {
             background: #0f172a;
@@ -72,13 +73,13 @@
 
     <div class="qr-card">
         <div class="logo">EasyPay Gateway</div>
-        <div>Total Amount to Pay</div>
+        <div style="color: #64748b; font-weight: 600;">Total Amount</div>
         <div id="amount-display">₹0</div>
         
-        <div id="qrcode"></div>
+        <div id="qrcode" title="Scan to Pay"></div>
         
         <div class="instructions">
-            Open the <b>EasyPay App</b> on your phone and scan this QR code to complete your payment.
+            Scan this QR code using the <b>EasyPay App</b> to complete your secure payment.
         </div>
 
         <button class="simulate-btn" onclick="sendSuccessMessage()">
@@ -87,36 +88,31 @@
     </div>
 
     <script>
-        // 1. Get the amount from the URL parameters
+        // 1. Get the amount and API key from the URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const amount = urlParams.get('amount') || '0';
+        const apiKey = urlParams.get('apiKey') || 'ep_4ya7hmnawmlumyxjn'; // Fallback to your key if missing
         
+        // Display the amount on the screen
         document.getElementById('amount-display').innerText = '₹' + amount;
 
-        // 2. Generate the QR Code Data
-        // You can format this JSON however your easy-pay-app-3f14f.web.app expects it
-        const qrData = JSON.stringify({
-            gateway: "EasyPay",
-            merchant: "Arabian Nights",
-            amount: amount,
-            currency: "INR",
-            timestamp: Date.now()
-        });
+        // 2. Construct the exact URL link you want embedded in the QR code
+        const targetPaymentLink = `https://easy-pay-gateway.web.app/?amount=${amount}&apiKey=${apiKey}`;
 
-        // 3. Render the QR Code
+        // 3. Render the QR Code containing the link
         new QRCode(document.getElementById("qrcode"), {
-            text: qrData,
-            width: 200,
-            height: 200,
+            text: targetPaymentLink, // The QR code now holds the web app link
+            width: 220,
+            height: 220,
             colorDark : "#0f172a",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
         });
 
-        // 4. Function to communicate back to the main website
+        // 4. Function to communicate back to the main website (home.html)
         function sendSuccessMessage() {
-            // Send the required PAYMENT_SUCCESS message to the parent window (home.html)
             if (window.opener) {
+                // Send success message to close popup and place order
                 window.opener.postMessage({ type: 'PAYMENT_SUCCESS', amount: amount }, '*');
             } else {
                 alert("Payment successful! You can close this window.");
