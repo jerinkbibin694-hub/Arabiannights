@@ -5,11 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARABIAN NIGHTS | The Sultan's Grand Feast</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
-    <script src="easypayio-gateway.js"></script>
-    
     <style>
         :root {
             --primary: #0f172a;
@@ -417,19 +415,22 @@
             <button class="close-page-btn" onclick="showPage('menu-page')" title="Close">✕</button>
         </div>
         
+        <!-- Cash Payment Note -->
         <div class="cash-note">
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
         
-        <div class="pay-option selected" onclick="selectPayment(this)" data-method="easypay">
+        <!-- UPI Option -->
+        <div class="pay-option selected" onclick="selectPayment(this)" data-method="upi">
             <span class="pay-icon">📱</span>
             <div class="pay-details">
-                <div class="pay-title">Pay using EasyPay App</div>
-                <div class="pay-description">Scan the QR code using your EasyPay App to complete payment</div>
+                <div class="pay-title">UPI Payment</div>
+                <div class="pay-description">Pay now using Google Pay, PhonePe, or any UPI app</div>
             </div>
         </div>
         
+        <!-- Cash Option (Pay After Eating) -->
         <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
             <span class="pay-icon">💵</span>
             <div class="pay-details">
@@ -441,8 +442,8 @@
 
         <div style="margin-top: 30px; padding: 20px; background: #e6f0ff; border-radius: 12px; border-left: 4px solid var(--info);">
             <p style="margin:0; color: #1e40af; font-size: 0.95rem;">
-                <strong>ℹ️ Note:</strong> Your order will be prepared immediately. For online payments, 
-                a secure payment window will open. For cash payments, please settle at the counter.
+                <strong>ℹ️ Note:</strong> Your order will be prepared immediately. For cash payments, 
+                please settle the bill at the counter when you're finished dining.
             </p>
         </div>
 
@@ -467,7 +468,8 @@
             <button class="close-page-btn" onclick="goBackToRestaurant()" title="Close">✕</button>
         </div>
         <div id="tracking-content">
-            </div>
+            <!-- Tracking content will be dynamically inserted here -->
+        </div>
     </div>
 </div>
 
@@ -517,19 +519,17 @@
             { id: "b3", name: "Rose Milk", price: 160, img: "drink3.jpg" },
             { id: "b4", name: "Tamarind Juice", price: 140, img: "drink4.jpg" },
             { id: "b5", name: "Karak tea", price: 140, img: "drink5.jpg" }
+            
         ]
     };
 
     let cart = {};
     let currentCat = "Starters";
     let guestInfo = {};
-    let selectedPaymentMethod = "easypay";
+    let selectedPaymentMethod = "upi";
     let currentOrderId = null;
     let trackingInterval = null;
     let currentOrderRef = null;
-
-    // Check if Easy PayIO is loaded
-    console.log('Easy PayIO Gateway available:', typeof EasyPayIO !== 'undefined');
 
     function handleLogin() {
         const name = document.getElementById('user-name').value;
@@ -669,46 +669,6 @@
             return;
         }
         
-        // Calculate total
-        const total = Object.keys(cart).reduce((sum, id) => {
-            const item = Object.values(menuData).flat().find(i => i.id === id);
-            return sum + (item.price * cart[id]);
-        }, 0);
-
-        if (selectedPaymentMethod === "easypay") {
-            // Use Easy PayIO for EasyPay App payments
-            try {
-                // Prepare order items for display
-                const orderItems = Object.keys(cart).map(id => {
-                    const item = Object.values(menuData).flat().find(i => i.id === id);
-                    return `${item.name} x${cart[id]}`;
-                }).join(', ');
-
-                // Initiate payment with Easy PayIO
-                EasyPayIO.pay({
-                    amount: total,
-                    productName: 'Arabian Nights Order',
-                    productDescription: orderItems.substring(0, 100), // First 100 chars
-                    userEmail: guestInfo.name + '@customer.com', // Placeholder email
-                    onSuccess: async function(response) {
-                        console.log('Payment successful:', response);
-                        
-                        // Payment succeeded - save order with paid status
-                        await saveOrderToFirebase(total, 'easypay', 'Paid');
-                    },
-
-                });
-            } catch (error) {
-                console.error('Easy PayIO error:', error);
-                alert('Payment gateway error. Please try cash payment option.');
-            }
-        } else {
-            // Cash payment - save order directly
-            await saveOrderToFirebase(total, 'cash', 'Pending');
-        }
-    }
-
-    async function saveOrderToFirebase(total, paymentMethod, paymentStatus) {
         // Create order object
         const orderItems = [];
         Object.keys(cart).forEach(id => {
@@ -723,7 +683,10 @@
             });
         });
 
-        // Create order
+        // Calculate total
+        const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+        // Create order with payment method and tracking info
         const order = {
             id: Date.now(),
             orderNumber: Math.floor(1000 + Math.random() * 9000), // Random 4-digit order number
@@ -734,8 +697,8 @@
             total: "₹" + total,
             totalAmount: total,
             status: "Pending",
-            paymentMethod: paymentMethod === "easypay" ? "EasyPay App (Paid Online)" : "Cash (Pay After Eating)",
-            paymentStatus: paymentStatus,
+            paymentMethod: selectedPaymentMethod === "upi" ? "UPI (Paid Online)" : "Cash (Pay After Eating)",
+            paymentStatus: selectedPaymentMethod === "upi" ? "Paid" : "Pending",
             timestamp: new Date().toISOString(),
             estimatedTime: null, // Will be set by staff
             preparationTime: null, // Staff will add this
@@ -760,8 +723,8 @@
 
             // Show success message with payment info
             let paymentMessage = "";
-            if (paymentMethod === "easypay") {
-                paymentMessage = "✅ Payment successful via EasyPay App. Your food will be served shortly!";
+            if (selectedPaymentMethod === "upi") {
+                paymentMessage = "✅ Payment successful via UPI. Your food will be served shortly!";
             } else {
                 paymentMessage = "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
             }
