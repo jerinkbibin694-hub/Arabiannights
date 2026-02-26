@@ -167,8 +167,8 @@
             background: #92400e;
         }
 
-        /* QR Navigation Button */
-        .qr-nav-btn {
+        /* Staff Link Button */
+        .staff-link {
             position: fixed;
             bottom: 30px;
             left: 30px;
@@ -185,9 +185,10 @@
             align-items: center;
             gap: 10px;
             transition: all 0.3s;
+            text-decoration: none;
         }
 
-        .qr-nav-btn:hover {
+        .staff-link:hover {
             background: var(--gold);
             transform: scale(1.05);
         }
@@ -251,6 +252,25 @@
         }
         .cash-note .text {
             font-weight: 500;
+        }
+
+        /* UPI Info Note */
+        .upi-info {
+            background: #e0e7ff;
+            border-left: 4px solid #4f46e5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .upi-info .icon {
+            font-size: 1.5rem;
+        }
+        .upi-info .text {
+            font-weight: 500;
+            color: #1e40af;
         }
 
         /* Order Tracking */
@@ -471,6 +491,24 @@
         @keyframes spin {
             to { transform: rotate(360deg); }
         }
+
+        /* Payment Status Badge */
+        .payment-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .payment-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .payment-paid {
+            background: #d1fae5;
+            color: #065f46;
+        }
     </style>
 </head>
 <body>
@@ -480,10 +518,10 @@
     <p>TRADITION IN EVERY BITE</p>
 </header>
 
-<!-- QR Navigation Button -->
-<button class="qr-nav-btn" onclick="goToQRPage()">
-    <span>📱</span> QR Payment Page
-</button>
+<!-- Staff Dashboard Link -->
+<a href="stafflogin.html" class="staff-link">
+    <span>👨‍🍳</span> Staff Dashboard
+</a>
 
 <div class="container">
     <div id="login-page" class="page active-page" style="text-align: center;">
@@ -529,13 +567,19 @@
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
+
+        <!-- UPI Info Note -->
+        <div class="upi-info">
+            <span class="icon">📱</span>
+            <span class="text">For UPI payments, staff will show you a QR code to scan</span>
+        </div>
         
         <!-- UPI Option -->
         <div class="pay-option selected" onclick="selectPayment(this)" data-method="upi">
             <span class="pay-icon">📱</span>
             <div class="pay-details">
                 <div class="pay-title">UPI / Online Payment</div>
-                <div class="pay-description">Pay now using Easy PayIO (Google Pay, PhonePe)</div>
+                <div class="pay-description">Pay using Google Pay, PhonePe, etc. - Staff will show QR</div>
             </div>
             <span class="pay-badge">Instant</span>
         </div>
@@ -552,7 +596,8 @@
 
         <div style="margin-top: 30px; padding: 20px; background: #e6f0ff; border-radius: 12px; border-left: 4px solid var(--info);">
             <p style="margin:0; color: #1e40af; font-size: 0.95rem;">
-                <strong>ℹ️ Note:</strong> For UPI payments, you'll be redirected to the QR payment page to complete the transaction.
+                <strong>ℹ️ How it works:</strong> After placing your UPI order, please inform the staff. 
+                They will show you a QR code on their device to scan and complete the payment.
             </p>
         </div>
 
@@ -568,7 +613,7 @@
         <div style="font-size: 80px; color: var(--success);">✓</div>
         <p id="success-msg"></p>
         <p id="payment-info" style="font-size: 1.1rem; background: #f3f4f6; padding: 15px; border-radius: 10px; margin-top: 20px;"></p>
-        <div style="display: flex; gap: 15px; margin-top: 30px; justify-content: center;">
+        <div style="display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap;">
             <button class="btn" style="max-width: 200px;" onclick="trackOrder()">📊 Track Order</button>
             <button class="btn" style="max-width: 200px; background: var(--gold);" onclick="showPage('menu-page')">🍽️ Order More</button>
         </div>
@@ -848,9 +893,13 @@
             });
         });
 
+        // Create unique order ID
+        const orderId = Date.now().toString();
+        const orderNumber = Math.floor(1000 + Math.random() * 9000);
+
         const order = {
-            id: Date.now().toString(),
-            orderNumber: Math.floor(1000 + Math.random() * 9000),
+            id: orderId,
+            orderNumber: orderNumber,
             name: guestInfo.name,
             table: guestInfo.table,
             items: orderItems,
@@ -860,7 +909,8 @@
             paymentMethod: selectedPaymentMethod === "upi" ? "UPI (Online)" : "Cash (Pay at Counter)",
             paymentStatus: "Pending",
             timestamp: new Date().toISOString(),
-            itemStatus: {}
+            itemStatus: {},
+            notified: false // For staff notification
         };
 
         // Initialize item status
@@ -875,32 +925,27 @@
             // Store current order ID
             currentOrderId = order.id;
 
+            // Clear cart
+            cart = {};
+            document.getElementById('count').innerText = "0";
+
             if (selectedPaymentMethod === "upi") {
-                // Use EasyPayIO gateway for UPI payment
-                EasyPayIO.initiateUPIPayment({
-                    orderId: order.id,
-                    amount: total,
-                    customerName: guestInfo.name,
-                    tableNumber: guestInfo.table,
-                    items: orderItems,
-                    orderNumber: order.orderNumber
-                });
-                // The redirect happens in the gateway
+                // UPI order - staff will show QR
+                document.getElementById('success-msg').innerHTML = `Order #${orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
+                document.getElementById('payment-info').innerHTML = `📱 Please inform the staff. They will show you a QR code on their device to complete the UPI payment.`;
             } else {
-                // Cash payment - stay on page
-                cart = {};
-                document.getElementById('count').innerText = "0";
-                
-                document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
-                document.getElementById('payment-info').innerHTML = `💰 Please pay ₹${total} in cash at the counter after your meal.`;
-                
-                showPage('success-page');
-                document.getElementById('cart-btn').style.display = 'none';
-                
-                // Re-enable button
-                payBtn.disabled = false;
-                payBtn.innerHTML = 'Place Order';
+                // Cash payment
+                document.getElementById('success-msg').innerHTML = `Order #${orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
+                document.getElementById('payment-info').innerHTML = `💰 Please pay ₹${total} in cash at the counter after your meal. Enjoy your dining!`;
             }
+            
+            showPage('success-page');
+            document.getElementById('cart-btn').style.display = 'none';
+            
+            // Re-enable button
+            payBtn.disabled = false;
+            payBtn.innerHTML = 'Place Order';
+            
         } catch (error) {
             console.error("Error saving order: ", error);
             alert("There was an error placing your order. Please try again.");
@@ -996,10 +1041,10 @@
             `;
         }
         
-        // Payment status indicator
+        // Payment status badge
         const paymentStatusBadge = order.paymentStatus === 'Paid' 
-            ? '<span style="background: var(--success); color: white; padding: 4px 12px; border-radius: 30px; font-size: 0.8rem;">✅ Paid</span>'
-            : '<span style="background: var(--warning); color: white; padding: 4px 12px; border-radius: 30px; font-size: 0.8rem;">⏳ Pending</span>';
+            ? '<span class="payment-badge payment-paid">✅ Paid</span>'
+            : '<span class="payment-badge payment-pending">⏳ Payment Pending</span>';
         
         content.innerHTML = `
             <div class="tracking-card">
@@ -1008,7 +1053,7 @@
                         <div class="order-id">Order #${order.orderNumber}</div>
                         <div>Table: ${order.table} | ${order.name}</div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px;">
+                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                         <div class="${statusClass}">${statusText}</div>
                         ${paymentStatusBadge}
                     </div>
@@ -1082,10 +1127,6 @@
         }
     }
 
-    function goToQRPage() {
-        window.location.href = 'qr-page.html';
-    }
-
     // Make functions globally available
     window.handleLogin = handleLogin;
     window.updateQty = updateQty;
@@ -1097,7 +1138,6 @@
     window.goBackToRestaurant = goBackToRestaurant;
     window.showPage = showPage;
     window.refreshTracking = refreshTracking;
-    window.goToQRPage = goToQRPage;
 </script>
 </body>
 </html>

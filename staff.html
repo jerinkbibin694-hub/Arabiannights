@@ -4,9 +4,13 @@
 <title>Kitchen Staff Panel - Arabian Nights</title>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+<!-- QR Code Library -->
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<!-- Easy PayIO Gateway SDK -->
+<script src="easypayio-gateway.js"></script>
 
 <style>
-/* Keeping your exact original CSS */
+/* Your existing CSS */
 body{ margin:0; font-family:Arial; background:#111; color:white; padding:30px; }
 h1{ text-align:center; color:#FFD700; }
 .order-card{ background:#1c1c1c; padding:20px; margin:20px 0; border-radius:15px; border-left: 5px solid #FFD700; transition: 0.3s; }
@@ -40,6 +44,157 @@ button:disabled { opacity:0.5; cursor:not-allowed; }
 .filter-btn:hover { background: #444; }
 .bulk-actions { background: #2c2c2c; padding: 15px; border-radius: 10px; margin-bottom: 20px; display: flex; gap: 15px; flex-wrap: wrap; align-items: center; }
 .bulk-actions select { padding: 8px; border-radius: 5px; background: #1c1c1c; color: white; border: 1px solid #444; }
+
+/* New QR Code Styles */
+.qr-section {
+    margin-top: 15px;
+    padding: 15px;
+    background: #2c2c2c;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.qr-code {
+    background: white;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.qr-code:hover {
+    transform: scale(1.05);
+}
+
+.qr-code canvas {
+    width: 150px !important;
+    height: 150px !important;
+    display: block;
+}
+
+.qr-placeholder {
+    width: 150px;
+    height: 150px;
+    background: #1c1c1c;
+    border-radius: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    border: 2px dashed #444;
+}
+
+.qr-placeholder span {
+    font-size: 2rem;
+    margin-bottom: 5px;
+}
+
+.qr-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 5px;
+}
+
+.qr-btn {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.qr-btn:hover {
+    background: #4338ca;
+}
+
+.qr-btn-success {
+    background: #059669;
+}
+
+.qr-btn-success:hover {
+    background: #047857;
+}
+
+/* Modal for full-size QR */
+.qr-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.8);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+}
+
+.qr-modal.active {
+    display: flex;
+}
+
+.qr-modal-content {
+    background: #1c1c1c;
+    border-radius: 20px;
+    padding: 30px;
+    max-width: 400px;
+    width: 90%;
+    text-align: center;
+    border: 2px solid #FFD700;
+}
+
+.qr-modal-content canvas {
+    width: 250px !important;
+    height: 250px !important;
+    margin: 20px 0;
+    background: white;
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.modal-close {
+    background: #FFD700;
+    color: black;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 15px;
+}
+
+.payment-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-left: 10px;
+}
+
+.payment-pending {
+    background: #b45309;
+    color: white;
+}
+
+.payment-paid {
+    background: #059669;
+    color: white;
+}
+
+.qr-note {
+    color: #FFD700;
+    font-size: 0.85rem;
+    margin-top: 5px;
+}
 </style>
 </head>
 <body>
@@ -93,7 +248,21 @@ button:disabled { opacity:0.5; cursor:not-allowed; }
 
 <div id="orders"></div>
 
+<!-- QR Modal for full-size display -->
+<div class="qr-modal" id="qrModal" onclick="closeQRModal()">
+    <div class="qr-modal-content" onclick="event.stopPropagation()">
+        <h3 style="color:#FFD700;" id="modalOrderTitle">Order QR Code</h3>
+        <div id="modalQRContainer"></div>
+        <p id="modalAmount" style="color:white; font-size:1.2rem;"></p>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button class="qr-btn" onclick="downloadModalQR()">⬇️ Download</button>
+            <button class="modal-close" onclick="closeQRModal()">Close</button>
+        </div>
+    </div>
+</div>
+
 <script>
+// Staff login check
 if(sessionStorage.getItem("staffLoggedIn") !== "true"){
     window.location.replace("stafflogin.html");
 }
@@ -123,6 +292,8 @@ const database = firebase.database();
 
 let currentFilter = 'all';
 let globalOrders = [];
+let currentQRCanvas = null;
+let currentQRCode = null;
 
 // Listen for live data
 database.ref('orders').on('value', (snapshot) => {
@@ -228,17 +399,49 @@ function renderOrders(){
 
         let statusColor = order.status === "Ready" ? "#00FF00" : (order.status === "Preparing" || order.status === "Partial" ? "#FFA500" : "#FFD700");
         let statusDisplay = order.status === "Partial" ? `Partial (${readyCount}/${order.items.length})` : order.status;
+        
+        // Payment status badge
+        let paymentBadge = order.paymentStatus === 'Paid' 
+            ? '<span class="payment-badge payment-paid">✅ Paid</span>' 
+            : '<span class="payment-badge payment-pending">⏳ Pending</span>';
+        
+        // QR Code Section for UPI orders
+        let qrSection = '';
+        if (order.paymentMethod && order.paymentMethod.includes('UPI') && order.paymentStatus !== 'Paid') {
+            qrSection = `
+                <div class="qr-section">
+                    <div id="qr-${order.key}" class="qr-code">
+                        <div class="qr-placeholder" onclick="generateQRForOrder('${order.key}')">
+                            <span>📱</span>
+                            <div>Click to Generate QR</div>
+                        </div>
+                    </div>
+                    <div class="qr-note">Show this QR to customer for UPI payment</div>
+                    <div class="qr-actions">
+                        <button class="qr-btn" onclick="generateQRForOrder('${order.key}')">🔄 Generate QR</button>
+                        <button class="qr-btn qr-btn-success" onclick="showFullQR('${order.key}')">🔍 View Large</button>
+                    </div>
+                </div>
+            `;
+        } else if (order.paymentStatus === 'Paid') {
+            qrSection = '<div style="background:#059669; padding:10px; border-radius:5px; margin-top:10px; text-align:center;">✅ Payment Received</div>';
+        }
 
         container.innerHTML += `
         <div class="order-card ${order.status.toLowerCase()}" style="border-left-color: ${statusColor}">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                <div><strong style="font-size: 1.2em;">Table ${order.table}</strong><span style="color:#888; margin-left:10px;">${order.name}</span></div>
+            <div style="display: flex; justify-content: space-between; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <div>
+                    <strong style="font-size: 1.2em;">Table ${order.table}</strong>
+                    <span style="color:#888; margin-left:10px;">${order.name}</span>
+                    ${paymentBadge}
+                </div>
                 <div><span class="status" style="background: ${statusColor}; color: black;">${statusDisplay}</span></div>
             </div>
             <div style="margin-bottom: 15px; color:#888;">
                 <small>Order #${order.id.toString().slice(-6)} • ${new Date(order.timestamp).toLocaleTimeString()}</small>
             </div>
             ${itemsHTML}
+            ${qrSection}
             <div style="margin-top: 20px; display: flex; gap: 10px;">
                 <button onclick="startAllItems('${order.key}')" ${order.status === 'Ready' ? 'disabled' : ''} style="background: #2563eb;">🏁 Start All</button>
                 <button onclick="completeAllItems('${order.key}')" ${order.status === 'Ready' ? 'disabled' : ''} style="background: #059669;">✅ Complete All</button>
@@ -249,7 +452,117 @@ function renderOrders(){
     updateStats(globalOrders);
 }
 
-// Data Update Functions utilizing Firebase
+// QR Code Functions
+function generateQRForOrder(orderId) {
+    const order = globalOrders.find(o => o.key === orderId);
+    if (!order) return;
+    
+    const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
+    
+    // Generate QR data using the gateway
+    const qrData = EasyPayIO.generateQRData ? EasyPayIO.generateQRData(order) : {
+        type: 'upi_payment',
+        merchant: 'Arabian Nights',
+        orderId: order.id,
+        orderNumber: order.orderNumber || order.id.slice(-6),
+        amount: amount,
+        customer: order.name,
+        table: order.table,
+        upiId: 'arabiannights@okhdfcbank',
+        timestamp: Date.now()
+    };
+    
+    // Find the QR container
+    const container = document.getElementById(`qr-${orderId}`);
+    if (!container) return;
+    
+    container.innerHTML = ''; // Clear placeholder
+    
+    // Generate QR code
+    QRCode.toCanvas(document.createElement('canvas'), JSON.stringify(qrData), {
+        width: 150,
+        margin: 1,
+        color: {
+            dark: '#000000',
+            light: '#ffffff'
+        }
+    }, function(err, canvas) {
+        if (err) {
+            console.error(err);
+            container.innerHTML = '<div style="color: red;">Error</div>';
+            return;
+        }
+        
+        // Style the canvas
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = 170;
+        finalCanvas.height = 170;
+        const ctx = finalCanvas.getContext('2d');
+        
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, 170, 170);
+        ctx.drawImage(canvas, 10, 10, 150, 150);
+        
+        // Add small logo
+        ctx.fillStyle = 'rgba(255, 215, 0, 0.2)';
+        ctx.beginPath();
+        ctx.arc(85, 85, 20, 0, 2 * Math.PI);
+        ctx.fill();
+        
+        ctx.font = 'bold 12px Arial';
+        ctx.fillStyle = '#FFD700';
+        ctx.textAlign = 'center';
+        ctx.fillText('AN', 85, 90);
+        
+        // Store for modal
+        currentQRCanvas = finalCanvas;
+        
+        container.appendChild(finalCanvas);
+    });
+}
+
+function showFullQR(orderId) {
+    const order = globalOrders.find(o => o.key === orderId);
+    if (!order) return;
+    
+    const modal = document.getElementById('qrModal');
+    const modalContainer = document.getElementById('modalQRContainer');
+    const canvas = document.querySelector(`#qr-${orderId} canvas`);
+    
+    if (canvas) {
+        // Clone the canvas for modal
+        const clonedCanvas = canvas.cloneNode(true);
+        clonedCanvas.width = 250;
+        clonedCanvas.height = 250;
+        modalContainer.innerHTML = '';
+        modalContainer.appendChild(clonedCanvas);
+        
+        document.getElementById('modalOrderTitle').textContent = `Order #${order.orderNumber || order.id.slice(-6)}`;
+        document.getElementById('modalAmount').textContent = `Amount: ${order.total}`;
+        
+        modal.classList.add('active');
+    } else {
+        // If QR not generated yet, generate first
+        generateQRForOrder(orderId);
+        setTimeout(() => showFullQR(orderId), 500);
+    }
+}
+
+function closeQRModal() {
+    document.getElementById('qrModal').classList.remove('active');
+}
+
+function downloadModalQR() {
+    const canvas = document.querySelector('#modalQRContainer canvas');
+    if (canvas) {
+        const link = document.createElement('a');
+        link.download = `qr-code.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+    }
+}
+
+// Your existing functions (keep them all)
 function markItemPreparing(orderId, itemId) {
     database.ref(`orders/${orderId}/itemStatus/${itemId}`).set('preparing');
 }
@@ -313,7 +626,6 @@ function bulkMarkReady() {
     database.ref(`orders/${orderId}/itemStatus`).update(updates);
 }
 
-// Utility UI Functions
 function filterOrdersByStatus(orders, filter) {
     if(filter === 'all') return orders;
     if(filter === 'partial') return orders.filter(o => o.status === 'Partial');
