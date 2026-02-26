@@ -5,10 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ARABIAN NIGHTS | The Sultan's Grand Feast</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    
+    <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-
+    
+    <!-- Easy PayIO Gateway SDK Integration -->
+    <script src="easypayio-gateway.js"></script>
+    
     <style>
         :root {
             --primary: #0f172a;
@@ -61,20 +64,38 @@
             border-bottom: 2px solid #f1f5f9;
         }
 
-        .page-header h2 { font-family: 'Playfair Display', serif; margin: 0; }
-
-        .close-page-btn {
-            background: var(--primary); color: white; border: none; width: 40px; height: 40px;
-            border-radius: 50%; font-size: 20px; font-weight: bold; cursor: pointer; display: flex;
-            align-items: center; justify-content: center; transition: all 0.3s; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        .page-header h2 {
+            font-family: 'Playfair Display', serif;
+            margin: 0;
         }
 
-        .close-page-btn:hover { background: var(--gold); transform: scale(1.1); }
+        .close-page-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .close-page-btn:hover {
+            background: var(--gold);
+            transform: scale(1.1);
+        }
 
         /* Input Styles */
         input { width: 100%; padding: 15px; margin: 12px 0; border-radius: 12px; border: 2px solid #e2e8f0; box-sizing: border-box; }
         .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
         .btn:hover { background: var(--gold); }
+        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
 
         /* Menu Grid */
         .controls { background: var(--dark); padding: 25px; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
@@ -88,11 +109,40 @@
         .card-body { padding: 20px; }
        
         /* THE ADD/REMOVE BUTTON SYSTEM */
-        .qty-control { display: flex; align-items: center; justify-content: space-between; background: #f8fafc; border-radius: 12px; border: 1px solid #e2e8f0; overflow: hidden; height: 45px; }
-        .qty-btn { background: var(--primary); color: white; border: none; width: 40px; height: 100%; cursor: pointer; font-size: 1.2rem; font-weight: bold; transition: 0.2s; }
+        .qty-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: #f8fafc;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            height: 45px;
+        }
+        .qty-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 40px;
+            height: 100%;
+            cursor: pointer;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: 0.2s;
+        }
         .qty-btn:hover { background: var(--gold); }
         .qty-num { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
-        .add-initial { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; height: 45px; }
+        .add-initial {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            width: 100%;
+            height: 45px;
+        }
 
         /* Pages */
         .page { display: none; padding: 40px; }
@@ -101,54 +151,226 @@
         .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
         /* Payment UI */
-        .pay-option { display: flex; align-items: center; padding: 20px; border: 2px solid #f1f5f9; border-radius: 15px; margin-bottom: 15px; cursor: pointer; transition: all 0.3s; }
-        .pay-option:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
-        .pay-option.selected { border-color: var(--gold); background: #fffcf0; border-width: 3px; }
-        .pay-icon { font-size: 2rem; margin-right: 15px; }
-        .pay-details { flex: 1; }
-        .pay-title { font-weight: 700; font-size: 1.2rem; margin-bottom: 5px; }
-        .pay-description { color: #64748b; font-size: 0.9rem; }
-        .cash-note { background: #fef3c7; border-left: 4px solid var(--gold); padding: 15px; margin: 20px 0; border-radius: 8px; display: flex; align-items: center; gap: 10px; }
-        .cash-note .icon { font-size: 1.5rem; }
-        .cash-note .text { font-weight: 500; }
-
-        /* Mock Gateway UI */
-        .gateway-card { background: white; max-width: 450px; margin: 0 auto; padding: 40px; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.1); text-align: center; border: 1px solid #e2e8f0; }
-        .gateway-amount { font-size: 2.5rem; font-weight: 700; color: var(--primary); margin: 20px 0; font-family: 'Playfair Display', serif; }
-        .gateway-secure { color: var(--success); font-size: 0.9rem; display: flex; align-items: center; justify-content: center; gap: 5px; margin-bottom: 20px; }
-        
-        /* Loading Spinner */
-        .spinner { border: 4px solid rgba(0, 0, 0, 0.1); width: 40px; height: 40px; border-radius: 50%; border-left-color: var(--gold); animation: spin 1s linear infinite; margin: 20px auto; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .pay-option { 
+            display: flex; 
+            align-items: center; 
+            padding: 20px; 
+            border: 2px solid #f1f5f9; 
+            border-radius: 15px; 
+            margin-bottom: 15px; 
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .pay-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .pay-option.selected { 
+            border-color: var(--gold); 
+            background: #fffcf0;
+            border-width: 3px;
+        }
+        .pay-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+        .pay-details {
+            flex: 1;
+        }
+        .pay-title {
+            font-weight: 700;
+            font-size: 1.2rem;
+            margin-bottom: 5px;
+        }
+        .pay-description {
+            color: #64748b;
+            font-size: 0.9rem;
+        }
+        .cash-note {
+            background: #fef3c7;
+            border-left: 4px solid var(--gold);
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .cash-note .icon {
+            font-size: 1.5rem;
+        }
+        .cash-note .text {
+            font-weight: 500;
+        }
 
         /* Order Tracking */
-        .tracking-card { background: white; border-radius: 20px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-top: 20px; }
-        .order-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #f1f5f9; padding-bottom: 20px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
-        .order-id { font-family: 'Playfair Display', serif; color: var(--gold); font-size: 1.2rem; }
-        .order-status { background: #fef3c7; color: var(--warning); padding: 8px 16px; border-radius: 30px; font-weight: 600; }
-        .order-status.preparing { background: #dbeafe; color: var(--info); }
-        .order-status.ready { background: #d1fae5; color: var(--success); }
-        .order-status.partial { background: #fff3cd; color: #856404; }
-        .timer-display { text-align: center; padding: 30px; background: linear-gradient(135deg, #0f172a, #1e293b); border-radius: 15px; color: white; margin: 20px 0; }
-        .timer { font-size: 4rem; font-weight: 700; font-family: monospace; color: var(--gold); }
-        .timer-label { font-size: 1rem; opacity: 0.8; margin-top: 10px; }
-        .order-items { margin: 20px 0; }
-        .order-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px dashed #e2e8f0; }
-        .order-item.ready { background: #f0fdf4; border-radius: 8px; color: var(--success); }
-        .progress-bar { width: 100%; height: 8px; background: #e2e8f0; border-radius: 4px; margin: 20px 0; overflow: hidden; }
-        .progress-fill { height: 100%; background: var(--gold); width: 0%; transition: width 0.3s; }
-        .refresh-btn { background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; margin-top: 20px; }
-        .refresh-btn:hover { background: var(--gold); }
+        .tracking-card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .order-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        .order-id {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 1.2rem;
+        }
+        .order-status {
+            background: #fef3c7;
+            color: var(--warning);
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+        }
+        .order-status.preparing {
+            background: #dbeafe;
+            color: var(--info);
+        }
+        .order-status.ready {
+            background: #d1fae5;
+            color: var(--success);
+        }
+        .order-status.partial {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .timer-display {
+            text-align: center;
+            padding: 30px;
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            border-radius: 15px;
+            color: white;
+            margin: 20px 0;
+        }
+        .timer {
+            font-size: 4rem;
+            font-weight: 700;
+            font-family: monospace;
+            color: var(--gold);
+        }
+        .timer-label {
+            font-size: 1rem;
+            opacity: 0.8;
+            margin-top: 10px;
+        }
+        .order-items {
+            margin: 20px 0;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+        .order-item.ready {
+            background: #f0fdf4;
+            border-radius: 8px;
+            color: var(--success);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            margin: 20px 0;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--gold);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .refresh-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-top: 20px;
+        }
+        .refresh-btn:hover {
+            background: var(--gold);
+        }
 
         /* Enjoy Food Card */
-        .enjoy-card { background: linear-gradient(135deg, #059669, #10b981); color: white; padding: 30px; border-radius: 20px; text-align: center; margin: 20px 0; animation: pulse 2s infinite; box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3); }
-        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.02); } 100% { transform: scale(1); } }
-        .enjoy-card h2 { font-size: 2.5rem; margin: 10px 0; font-family: 'Playfair Display', serif; }
-        .enjoy-card .emoji { font-size: 5rem; margin-bottom: 10px; }
-        .enjoy-card .subtitle { font-size: 1.2rem; opacity: 0.9; margin-top: 10px; }
-        .enjoy-card .order-details { background: rgba(255,255,255,0.2); padding: 15px; border-radius: 10px; margin-top: 20px; }
-        .item-timing { font-size: 0.8rem; color: var(--gold); margin-left: 10px; }
-        .ready-badge { background: var(--success); color: white; padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; margin-left: 5px; }
+        .enjoy-card {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            margin: 20px 0;
+            animation: pulse 2s infinite;
+            box-shadow: 0 10px 30px rgba(5, 150, 105, 0.3);
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.02);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        
+        .enjoy-card h2 {
+            font-size: 2.5rem;
+            margin: 10px 0;
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .enjoy-card .emoji {
+            font-size: 5rem;
+            margin-bottom: 10px;
+        }
+        
+        .enjoy-card .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+            margin-top: 10px;
+        }
+        
+        .enjoy-card .order-details {
+            background: rgba(255,255,255,0.2);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .item-timing {
+            font-size: 0.8rem;
+            color: var(--gold);
+            margin-left: 10px;
+        }
+
+        .ready-badge {
+            background: var(--success);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 5px;
+        }
     </style>
 </head>
 <body>
@@ -197,60 +419,40 @@
             <button class="close-page-btn" onclick="showPage('menu-page')" title="Close">✕</button>
         </div>
         
+        <!-- Cash Payment Note -->
         <div class="cash-note">
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
         
+        <!-- UPI Option (using Easy PayIO) -->
         <div class="pay-option selected" onclick="selectPayment(this)" data-method="upi">
             <span class="pay-icon">📱</span>
             <div class="pay-details">
-                <div class="pay-title">UPI Payment</div>
-                <div class="pay-description">Pay using Google Pay, PhonePe, Paytm</div>
+                <div class="pay-title">UPI / Online Payment</div>
+                <div class="pay-description">Pay now using Easy PayIO (Google Pay, PhonePe, etc.)</div>
             </div>
         </div>
         
+        <!-- Cash Option (Pay After Eating) -->
         <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
             <span class="pay-icon">💵</span>
             <div class="pay-details">
                 <div class="pay-title">Cash Payment</div>
-                <div class="pay-description">Pay after your meal at the counter</div>
+                <div class="pay-description">Pay after your meal at the counter (Recommended)</div>
             </div>
             <span style="background: var(--gold); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Pay Later</span>
         </div>
 
+        <div style="margin-top: 30px; padding: 20px; background: #e6f0ff; border-radius: 12px; border-left: 4px solid var(--info);">
+            <p style="margin:0; color: #1e40af; font-size: 0.95rem;">
+                <strong>ℹ️ Note:</strong> Your order will be prepared immediately. For online payments, 
+                a secure payment window will open. For cash payments, please settle at the counter.
+            </p>
+        </div>
+
         <button class="btn" style="margin-top: 30px; background: var(--gold)" onclick="processPayment()" id="confirm-payment-btn">Place Order</button>
         <button class="btn" style="margin-top: 10px; background: #94a3b8" onclick="showPage('cart-page')">Back to Cart</button>
-    </div>
-
-    <div id="dummy-gateway-page" class="page">
-        <div class="gateway-card">
-            <h3 style="margin-top: 0; color: #64748b;">TEST PAYMENT GATEWAY</h3>
-            <div class="gateway-secure">🔒 100% Secure Transaction</div>
-            <p style="margin-bottom: 0;">Amount to Pay</p>
-            <div class="gateway-amount" id="gateway-display-amount">₹0</div>
-            
-            <div style="text-align: left; margin-bottom: 20px;">
-                <label style="font-weight: 600; font-size: 0.9rem; color: #475569;">Enter UPI ID</label>
-                <input type="text" id="upi-id-input" placeholder="e.g., success@okicici" value="success@upi" style="border-color: var(--gold);">
-            </div>
-            
-            <button class="btn" id="gateway-pay-btn" style="background: var(--success);" onclick="simulateUpiProcessing()">Verify & Pay Now</button>
-            
-            <div id="gateway-processing" style="display: none;">
-                <div class="spinner"></div>
-                <p style="color: var(--gold); font-weight: 600;">Processing Payment with Bank...</p>
-                <p style="font-size: 0.8rem; color: #64748b;">Please do not refresh or close this page</p>
-            </div>
-            
-            <button class="btn" id="gateway-cancel-btn" style="background: #e2e8f0; color: #475569; margin-top: 15px;" onclick="showPage('payment-page')">Cancel Transaction</button>
-        </div>
-    </div>
-
-    <div id="payment-success-transition" class="page" style="text-align: center; padding-top: 80px;">
-        <div style="font-size: 120px; color: var(--success); animation: pulse 1s ease-out;">✅</div>
-        <h2 style="font-family: 'Playfair Display', serif; font-size: 2.5rem; color: var(--success);">Payment Successful!</h2>
-        <p style="font-size: 1.2rem; color: #64748b;">Redirecting to your order details...</p>
     </div>
 
     <div id="success-page" class="page" style="text-align: center;">
@@ -269,14 +471,16 @@
             <h2 style="font-family: 'Playfair Display';">Track Your Order</h2>
             <button class="close-page-btn" onclick="goBackToRestaurant()" title="Close">✕</button>
         </div>
-        <div id="tracking-content"></div>
+        <div id="tracking-content">
+            <!-- Tracking content will be dynamically inserted here -->
+        </div>
     </div>
 </div>
 
 <div class="cart-trigger" id="cart-btn" onclick="showCart()" style="display: none;">🛒 <span id="count">0</span> Items</div>
 
 <script>
-    // Firebase Configuration
+    // Your Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
         authDomain: "arabian-nights-cca24.firebaseapp.com",
@@ -288,6 +492,7 @@
         measurementId: "G-N6ZC0F2J5V"
     };
 
+    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
@@ -324,10 +529,13 @@
     let cart = {};
     let currentCat = "Starters";
     let guestInfo = {};
-    let selectedPaymentMethod = "upi"; // Default is back to UPI
+    let selectedPaymentMethod = "upi";
     let currentOrderId = null;
     let trackingInterval = null;
     let currentOrderRef = null;
+
+    // Check if Easy PayIO is loaded
+    console.log('Easy PayIO Gateway available:', typeof EasyPayIO !== 'undefined');
 
     function handleLogin() {
         const name = document.getElementById('user-name').value;
@@ -335,6 +543,7 @@
         
         if(!name) return alert("Please enter your name");
         
+        // Validate table number if provided
         if (table) {
             const tableNum = parseInt(table);
             if (tableNum < 1 || tableNum > 20) {
@@ -342,7 +551,10 @@
             }
         }
         
-        guestInfo = { name: name, table: table || "Takeaway" };
+        guestInfo = { 
+            name: name, 
+            table: table || "Takeaway" 
+        };
         
         initMenu();
         showPage('menu-page');
@@ -367,9 +579,13 @@
         const searchTerm = document.getElementById('search').value.toLowerCase();
         
         grid.innerHTML = "";
+        
+        // Filter items based on search
         let itemsToShow = menuData[currentCat];
         if (searchTerm) {
-            itemsToShow = itemsToShow.filter(item => item.name.toLowerCase().includes(searchTerm));
+            itemsToShow = itemsToShow.filter(item => 
+                item.name.toLowerCase().includes(searchTerm)
+            );
         }
         
         itemsToShow.forEach(item => {
@@ -404,9 +620,11 @@
         if (newQty <= 0) delete cart[id];
         else cart[id] = newQty;
 
+        // Update total count
         const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
         document.getElementById('count').innerText = totalItems;
-        render();
+       
+        render(); // Refresh the list to show new buttons
     }
 
     function showCart() {
@@ -437,7 +655,11 @@
     }
 
     function validateAndShowPayment() {
-        if (Object.keys(cart).length === 0) return alert("Your cart is empty!");
+        if (Object.keys(cart).length === 0) {
+            alert("Your cart is empty!");
+            return;
+        }
+        
         showPage('payment-page');
     }
 
@@ -447,61 +669,56 @@
         selectedPaymentMethod = el.getAttribute('data-method');
     }
 
-    // NEW PAYMENT LOGIC FOR MOCK GATEWAY
-    function processPayment() {
+    async function processPayment() {
         if (Object.keys(cart).length === 0) {
             alert("Your cart is empty!");
             return;
         }
-
-        let total = 0;
-        Object.keys(cart).forEach(id => {
+        
+        // Calculate total
+        const total = Object.keys(cart).reduce((sum, id) => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
-            total += (item.price * cart[id]);
-        });
+            return sum + (item.price * cart[id]);
+        }, 0);
 
         if (selectedPaymentMethod === "upi") {
-            // Route to dummy gateway and display amount
-            document.getElementById('gateway-display-amount').innerText = "₹" + total;
-            showPage('dummy-gateway-page');
+            // Use Easy PayIO for UPI payments
+            try {
+                // Prepare order items for display
+                const orderItems = Object.keys(cart).map(id => {
+                    const item = Object.values(menuData).flat().find(i => i.id === id);
+                    return `${item.name} x${cart[id]}`;
+                }).join(', ');
+
+                // Initiate payment with Easy PayIO
+                EasyPayIO.pay({
+                    amount: total,
+                    productName: 'Arabian Nights Order',
+                    productDescription: orderItems.substring(0, 100), // First 100 chars
+                    userEmail: guestInfo.name + '@customer.com', // Placeholder email
+                    onSuccess: async function(response) {
+                        console.log('Payment successful:', response);
+                        
+                        // Payment succeeded - save order with paid status
+                        await saveOrderToFirebase(total, 'upi', 'Paid');
+                    },
+                    onFailure: function(error) {
+                        console.error('Payment failed:', error);
+                        alert('Payment failed: ' + (error.error || 'Unknown error'));
+                    }
+                });
+            } catch (error) {
+                console.error('Easy PayIO error:', error);
+                alert('Payment gateway error. Please try cash payment option.');
+            }
         } else {
-            // Cash payment bypasses the gateway
-            finalizeOrder("Cash (Pay After Eating)", "Pending");
+            // Cash payment - save order directly
+            await saveOrderToFirebase(total, 'cash', 'Pending');
         }
     }
 
-    // SIMULATING THE BANK PROCESSING DELAY
-    function simulateUpiProcessing() {
-        const upiId = document.getElementById('upi-id-input').value;
-        if(!upiId || !upiId.includes('@')) {
-            return alert("Please enter a valid dummy UPI ID (e.g., success@upi)");
-        }
-
-        // Hide buttons, show loading spinner
-        document.getElementById('gateway-pay-btn').style.display = 'none';
-        document.getElementById('gateway-cancel-btn').style.display = 'none';
-        document.getElementById('gateway-processing').style.display = 'block';
-
-        // Simulate a 2.5 second network delay with the bank
-        setTimeout(() => {
-            // Transition to the "Payment Successful" screen
-            showPage('payment-success-transition');
-            
-            // Wait 1.5 seconds on the success screen, then finalize the order in Firebase
-            setTimeout(() => {
-                // Reset gateway UI for future orders
-                document.getElementById('gateway-pay-btn').style.display = 'block';
-                document.getElementById('gateway-cancel-btn').style.display = 'block';
-                document.getElementById('gateway-processing').style.display = 'none';
-                
-                // Save to database
-                finalizeOrder(`UPI (${upiId})`, "Paid Online");
-            }, 1500);
-            
-        }, 2500);
-    }
-
-    async function finalizeOrder(paymentMethodText, paymentStatusText) {
+    async function saveOrderToFirebase(total, paymentMethod, paymentStatus) {
+        // Create order object
         const orderItems = [];
         Object.keys(cart).forEach(id => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
@@ -511,41 +728,52 @@
                 price: item.price,
                 quantity: cart[id],
                 category: Object.keys(menuData).find(cat => menuData[cat].some(i => i.id === id)),
-                time: "Not Set" 
+                time: "Not Set" // Staff will set this
             });
         });
 
-        const total = orderItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
+        // Create order
         const order = {
             id: Date.now(),
-            orderNumber: Math.floor(1000 + Math.random() * 9000), 
+            orderNumber: Math.floor(1000 + Math.random() * 9000), // Random 4-digit order number
             name: guestInfo.name,
             table: guestInfo.table,
             items: orderItems,
-            itemStatus: {}, 
+            itemStatus: {}, // Will track per-item status
             total: "₹" + total,
             totalAmount: total,
             status: "Pending",
-            paymentMethod: paymentMethodText,
-            paymentStatus: paymentStatusText,
+            paymentMethod: paymentMethod === "upi" ? "UPI (Paid Online)" : "Cash (Pay After Eating)",
+            paymentStatus: paymentStatus,
             timestamp: new Date().toISOString(),
-            estimatedTime: null, 
-            preparationTime: null, 
+            estimatedTime: null, // Will be set by staff
+            preparationTime: null, // Staff will add this
             notified: false
         };
 
-        order.items.forEach(item => { order.itemStatus[item.id] = 'pending'; });
+        // Initialize item status
+        order.items.forEach(item => {
+            order.itemStatus[item.id] = 'pending';
+        });
 
         try {
+            // Save to Firebase Realtime Database
             await database.ref('orders/' + order.id).set(order);
+            
+            // Store current order ID
             currentOrderId = order.id;
+
+            // Clear cart
             cart = {};
             document.getElementById('count').innerText = "0";
 
-            let paymentMessage = paymentStatusText === "Paid Online" 
-                ? "✅ Payment successful. Your food will be served shortly!" 
-                : "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
+            // Show success message with payment info
+            let paymentMessage = "";
+            if (paymentMethod === "upi") {
+                paymentMessage = "✅ Payment successful via UPI. Your food will be served shortly!";
+            } else {
+                paymentMessage = "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
+            }
             
             document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
             document.getElementById('payment-info').innerHTML = paymentMessage;
@@ -559,20 +787,27 @@
     }
 
     function trackOrder() {
-        if (trackingInterval) clearInterval(trackingInterval);
+        if (trackingInterval) {
+            clearInterval(trackingInterval);
+        }
+        
         if (!currentOrderId) {
             alert("No active order found. Please place a new order.");
             showPage('menu-page');
             return;
         }
 
-        if (currentOrderRef) currentOrderRef.off(); 
+        // Set up real-time listener for this order
+        if (currentOrderRef) {
+            currentOrderRef.off(); // Remove previous listener
+        }
 
         currentOrderRef = database.ref('orders/' + currentOrderId);
         currentOrderRef.on('value', (snapshot) => {
             const order = snapshot.val();
-            if (order) renderTrackingPage(order);
-            else {
+            if (order) {
+                renderTrackingPage(order);
+            } else {
                 alert("Order not found. Please place a new order.");
                 showPage('menu-page');
             }
@@ -583,13 +818,19 @@
 
     function renderTrackingPage(order) {
         const content = document.getElementById('tracking-content');
-        let readyItems = 0;
-        if (order.itemStatus) readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
         
+        // Calculate ready items count
+        let readyItems = 0;
+        if (order.itemStatus) {
+            readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
+        }
         const totalItems = order.items.length;
         const allReady = readyItems === totalItems && totalItems > 0;
+        
+        // Calculate progress based on ready items
         let progressWidth = totalItems > 0 ? (readyItems / totalItems) * 100 : 0;
         
+        // Determine status class and text
         let statusClass = "order-status";
         let statusText = order.status;
         
@@ -605,19 +846,43 @@
             statusClass += " pending";
         }
         
+        // Check if all items have times set
         const itemsWithTimes = order.items.filter(item => item.time && item.time !== "Not Set");
         const allTimesSet = itemsWithTimes.length === totalItems;
         
+        // Calculate estimated time if available
         let timeDisplay = "";
         if (order.estimatedTime) {
-            timeDisplay = `<div class="timer-display"><div class="timer-label">Estimated Preparation Time</div><div class="timer">${order.estimatedTime} min</div><div style="margin-top: 10px; font-size: 0.9rem;">Set by kitchen staff</div></div>`;
+            timeDisplay = `
+                <div class="timer-display">
+                    <div class="timer-label">Estimated Preparation Time</div>
+                    <div class="timer">${order.estimatedTime} min</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;">Set by kitchen staff</div>
+                </div>
+            `;
         } else if (allTimesSet) {
+            // Calculate max time from items
             const maxTime = Math.max(...itemsWithTimes.map(item => parseInt(item.time) || 0));
-            if (maxTime > 0) timeDisplay = `<div class="timer-display"><div class="timer-label">Estimated Preparation Time</div><div class="timer">${maxTime} min</div><div style="margin-top: 10px; font-size: 0.9rem;">Based on individual item times</div></div>`;
+            if (maxTime > 0) {
+                timeDisplay = `
+                    <div class="timer-display">
+                        <div class="timer-label">Estimated Preparation Time</div>
+                        <div class="timer">${maxTime} min</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">Based on individual item times</div>
+                    </div>
+                `;
+            }
         } else {
-            timeDisplay = `<div class="timer-display"><div class="timer-label">Waiting for kitchen</div><div class="timer">--</div><div style="margin-top: 10px; font-size: 0.9rem;">Staff will update soon</div></div>`;
+            timeDisplay = `
+                <div class="timer-display">
+                    <div class="timer-label">Waiting for kitchen</div>
+                    <div class="timer">--</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;">Staff will update soon</div>
+                </div>
+            `;
         }
         
+        // Build items list with times
         let itemsHtml = "";
         order.items.forEach(item => {
             const itemStatus = order.itemStatus ? order.itemStatus[item.id] : 'pending';
@@ -626,11 +891,17 @@
             
             itemsHtml += `
                 <div class="order-item ${isReady ? 'ready' : ''}">
-                    <span>${item.name} x${item.quantity} ${itemTime ? `<span class="item-timing">⏱️ ${itemTime}</span>` : ''} ${isReady ? '<span class="ready-badge">✅ Ready</span>' : ''}</span>
+                    <span>
+                        ${item.name} x${item.quantity}
+                        ${itemTime ? `<span class="item-timing">⏱️ ${itemTime}</span>` : ''}
+                        ${isReady ? '<span class="ready-badge">✅ Ready</span>' : ''}
+                    </span>
                     <span>₹${item.price * item.quantity}</span>
-                </div>`;
+                </div>
+            `;
         });
         
+        // Show ENJOY YOUR FOOD card if all items are ready
         let enjoyCard = "";
         if (allReady) {
             enjoyCard = `
@@ -643,7 +914,8 @@
                         <p style="font-size: 1.5rem; font-weight: bold;">${order.total}</p>
                         <p style="margin-top: 10px;">👨‍🍳 Prepared with love by our chefs</p>
                     </div>
-                </div>`;
+                </div>
+            `;
         }
         
         content.innerHTML = `
@@ -655,24 +927,61 @@
                     </div>
                     <div class="${statusClass}">${statusText}</div>
                 </div>
+                
                 ${enjoyCard || timeDisplay}
-                <div class="progress-bar"><div class="progress-fill" style="width: ${progressWidth}%"></div></div>
+                
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: ${progressWidth}%"></div>
+                </div>
+                
                 <div style="margin: 20px 0;">
                     <h4>Order Items: <span style="color: var(--success);">${readyItems}/${totalItems} Ready</span></h4>
-                    <div class="order-items">${itemsHtml}</div>
+                    <div class="order-items">
+                        ${itemsHtml}
+                    </div>
                 </div>
+                
                 <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-top: 20px;">
                     <div style="display: flex; justify-content: space-between; font-weight: 700;">
-                        <span>Total Amount:</span><span>${order.total}</span>
+                        <span>Total Amount:</span>
+                        <span>${order.total}</span>
                     </div>
-                    <div style="margin-top: 10px; color: #64748b;">Payment: ${order.paymentMethod}</div>
+                    <div style="margin-top: 10px; color: #64748b;">
+                        Payment: ${order.paymentMethod}
+                    </div>
                 </div>
-            </div>`;
+                
+                <button class="refresh-btn" onclick="refreshTracking()">
+                    🔄 Refresh Status
+                </button>
+            </div>
+        `;
+    }
+
+    function refreshTracking() {
+        // No need to manually refresh as Firebase real-time listener handles it
+        if (currentOrderRef) {
+            currentOrderRef.once('value', (snapshot) => {
+                const order = snapshot.val();
+                if (order) {
+                    renderTrackingPage(order);
+                }
+            });
+        }
     }
 
     function goBackToRestaurant() {
-        if (trackingInterval) { clearInterval(trackingInterval); trackingInterval = null; }
-        if (currentOrderRef) { currentOrderRef.off(); currentOrderRef = null; }
+        if (trackingInterval) {
+            clearInterval(trackingInterval);
+            trackingInterval = null;
+        }
+        
+        // Remove Firebase listener
+        if (currentOrderRef) {
+            currentOrderRef.off();
+            currentOrderRef = null;
+        }
+        
         showPage('menu-page');
         document.getElementById('cart-btn').style.display = 'block';
     }
@@ -681,7 +990,12 @@
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(id).classList.add('active-page');
         window.scrollTo(0,0);
-        if (id !== 'tracking-page' && trackingInterval) { clearInterval(trackingInterval); trackingInterval = null; }
+        
+        // Clear tracking interval if leaving tracking page
+        if (id !== 'tracking-page' && trackingInterval) {
+            clearInterval(trackingInterval);
+            trackingInterval = null;
+        }
     }
 </script>
 </body>
