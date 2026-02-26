@@ -53,6 +53,8 @@
         .header {
             text-align: center;
             margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 2px dashed #e2e8f0;
         }
 
         .header h1 {
@@ -67,7 +69,7 @@
             font-size: 14px;
         }
 
-        .header .upi-badge {
+        .upi-badge {
             background: #4f46e5;
             color: white;
             padding: 6px 16px;
@@ -78,46 +80,7 @@
             margin-top: 10px;
         }
 
-        .order-selector {
-            margin-bottom: 25px;
-        }
-
-        .order-selector label {
-            display: block;
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 8px;
-            font-size: 14px;
-        }
-
-        .order-selector select {
-            width: 100%;
-            padding: 16px 20px;
-            border-radius: 20px;
-            border: 2px solid #e2e8f0;
-            font-family: 'Inter', sans-serif;
-            font-size: 15px;
-            background: white;
-            cursor: pointer;
-            transition: all 0.3s;
-            appearance: none;
-            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%234f46e5' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-            background-repeat: no-repeat;
-            background-position: right 15px center;
-            background-size: 20px;
-        }
-
-        .order-selector select:hover {
-            border-color: #4f46e5;
-        }
-
-        .order-selector select:focus {
-            outline: none;
-            border-color: #4f46e5;
-            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-        }
-
-        .selected-order-card {
+        .order-details-card {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border-radius: 24px;
             padding: 20px;
@@ -140,8 +103,8 @@
             color: #4f46e5;
         }
 
-        .order-status-badge {
-            background: #4f46e5;
+        .order-status {
+            background: #f59e0b;
             color: white;
             padding: 4px 12px;
             border-radius: 30px;
@@ -149,14 +112,14 @@
             font-weight: 600;
         }
 
-        .customer-info {
+        .info-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 12px;
             margin-bottom: 15px;
         }
 
-        .info-item {
+        .info-box {
             background: white;
             padding: 12px;
             border-radius: 16px;
@@ -176,42 +139,7 @@
             font-size: 16px;
         }
 
-        .items-preview {
-            background: white;
-            border-radius: 16px;
-            padding: 15px;
-            margin-top: 10px;
-        }
-
-        .items-title {
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-
-        .preview-item {
-            display: flex;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px dashed #e2e8f0;
-            font-size: 13px;
-        }
-
-        .preview-item:last-child {
-            border-bottom: none;
-        }
-
-        .preview-item-name {
-            color: #475569;
-        }
-
-        .preview-item-price {
-            font-weight: 600;
-            color: #4f46e5;
-        }
-
-        .total-amount {
+        .total-section {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -228,7 +156,7 @@
 
         .total-value {
             color: #4f46e5;
-            font-size: 24px;
+            font-size: 28px;
         }
 
         .qr-section {
@@ -238,19 +166,6 @@
             text-align: center;
             margin-bottom: 20px;
             border: 2px solid #e2e8f0;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .qr-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(79, 70, 229, 0.03) 0%, transparent 70%);
-            pointer-events: none;
         }
 
         .qr-title {
@@ -258,15 +173,6 @@
             color: #1f2937;
             margin-bottom: 20px;
             font-size: 18px;
-        }
-
-        .qr-title span {
-            color: #4f46e5;
-            font-weight: 700;
-            background: #e0e7ff;
-            padding: 4px 12px;
-            border-radius: 30px;
-            margin-left: 8px;
         }
 
         #qrcode {
@@ -346,12 +252,11 @@
         .app-text small {
             color: #64748b;
             font-size: 12px;
-            font-weight: 400;
             display: block;
             margin-top: 4px;
         }
 
-        .payment-instructions {
+        .instructions {
             background: #e0e7ff;
             border-radius: 20px;
             padding: 20px;
@@ -368,7 +273,7 @@
             gap: 8px;
         }
 
-        .instruction-step {
+        .step {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -376,7 +281,7 @@
             border-bottom: 1px dashed #a5b4fc;
         }
 
-        .instruction-step:last-child {
+        .step:last-child {
             border-bottom: none;
         }
 
@@ -391,11 +296,6 @@
             justify-content: center;
             font-weight: 700;
             font-size: 14px;
-        }
-
-        .step-text {
-            color: #1e293b;
-            font-weight: 500;
         }
 
         .action-buttons {
@@ -430,6 +330,15 @@
             box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
         }
 
+        .btn-success {
+            background: #059669;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #047857;
+        }
+
         .btn-secondary {
             background: #f1f5f9;
             color: #334155;
@@ -438,90 +347,36 @@
 
         .btn-secondary:hover {
             background: #e2e8f0;
-            transform: translateY(-2px);
         }
 
-        .empty-state {
+        .loading {
             text-align: center;
-            padding: 60px 20px;
-            background: #f8fafc;
-            border-radius: 30px;
+            padding: 40px;
+        }
+
+        .loading-spinner {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error-message {
+            background: #fee2e2;
+            border: 2px solid #dc2626;
+            border-radius: 20px;
+            padding: 30px;
+            text-align: center;
+            color: #991b1b;
             margin: 20px 0;
-        }
-
-        .empty-icon {
-            font-size: 64px;
-            margin-bottom: 15px;
-            opacity: 0.5;
-        }
-
-        .empty-title {
-            font-weight: 600;
-            color: #334155;
-            margin-bottom: 8px;
-            font-size: 18px;
-        }
-
-        .empty-subtitle {
-            color: #64748b;
-            font-size: 14px;
-        }
-
-        .back-button {
-            text-align: center;
-            margin-top: 20px;
-        }
-
-        .back-link {
-            color: #64748b;
-            text-decoration: none;
-            font-size: 14px;
-            font-weight: 500;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-            transition: all 0.3s;
-            padding: 10px 20px;
-            border-radius: 30px;
-            background: #f1f5f9;
-        }
-
-        .back-link:hover {
-            color: #4f46e5;
-            background: #e0e7ff;
-        }
-
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            border-radius: 16px;
-            padding: 16px 24px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 1000;
-            animation: slideInRight 0.3s ease;
-            max-width: 350px;
-            border-left: 4px solid #4f46e5;
-        }
-
-        .notification.success {
-            border-left-color: #059669;
-        }
-
-        .notification.error {
-            border-left-color: #dc2626;
-        }
-
-        @keyframes slideInRight {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
         }
 
         .success-message {
@@ -529,14 +384,31 @@
             border: 2px solid #059669;
             border-radius: 20px;
             padding: 30px;
-            margin: 20px 0;
             text-align: center;
             color: #065f46;
+            margin: 20px 0;
         }
 
         .success-icon {
             font-size: 48px;
             margin-bottom: 15px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #64748b;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 10px 20px;
+            border-radius: 30px;
+            background: #f1f5f9;
+            transition: all 0.3s;
+        }
+
+        .back-link:hover {
+            color: #4f46e5;
+            background: #e0e7ff;
         }
 
         .hidden {
@@ -549,39 +421,53 @@
         <div class="header">
             <h1>Easy Pay IO</h1>
             <div class="subtitle">UPI QR Payment Gateway</div>
-            <div class="upi-badge">UPI ONLY</div>
+            <div class="upi-badge">UPI PAYMENT</div>
         </div>
 
-        <!-- Order Selection -->
-        <div class="order-selector">
-            <label>📋 Select Order to Pay</label>
-            <select id="orderSelect" onchange="loadSelectedOrder()">
-                <option value="">Select an order...</option>
-            </select>
+        <!-- Loading State -->
+        <div id="loadingState" class="loading">
+            <div class="loading-spinner"></div>
+            <p>Loading order details...</p>
         </div>
 
-        <!-- Selected Order Card (Initially Hidden) -->
-        <div id="selectedOrderCard" class="hidden"></div>
+        <!-- Order Details Card (Initially Hidden) -->
+        <div id="orderDetails" class="hidden">
+            <div class="order-details-card">
+                <div class="order-header">
+                    <span class="order-number" id="orderNumberDisplay">Order #</span>
+                    <span class="order-status">Pending Payment</span>
+                </div>
+                
+                <div class="info-grid">
+                    <div class="info-box">
+                        <div class="info-label">Customer</div>
+                        <div class="info-value" id="customerName">-</div>
+                    </div>
+                    <div class="info-box">
+                        <div class="info-label">Table</div>
+                        <div class="info-value" id="tableNumber">-</div>
+                    </div>
+                </div>
+
+                <div class="total-section">
+                    <span class="total-label">Total Amount</span>
+                    <span class="total-value" id="totalAmount">₹0</span>
+                </div>
+            </div>
+        </div>
 
         <!-- QR Section (Initially Hidden) -->
         <div id="qrSection" class="hidden">
             <div class="qr-section">
-                <div class="qr-title">
-                    Scan QR to Pay
-                </div>
+                <div class="qr-title">Scan QR to Pay</div>
                 <div id="qrcode">
-                    <div style="padding: 40px; color: #9ca3af;">
-                        <div style="font-size: 48px; margin-bottom: 10px;">📱</div>
-                        <div>Generating QR code...</div>
-                    </div>
+                    <div style="padding: 40px; color: #9ca3af;">Generating QR code...</div>
                 </div>
-                <div class="amount-display" id="amountDisplay">₹0</div>
                 <div class="secure-badge">
                     <span>🔒</span> Safe · Secure · Instant
                 </div>
             </div>
 
-            <!-- App Info -->
             <div class="app-info">
                 <div class="app-icon">E</div>
                 <div class="app-text">
@@ -590,33 +476,31 @@
                 </div>
             </div>
 
-            <!-- Payment Instructions -->
-            <div class="payment-instructions">
+            <div class="instructions">
                 <div class="instructions-title">
                     <span>📱</span> How to Pay
                 </div>
-                <div class="instruction-step">
+                <div class="step">
                     <span class="step-number">1</span>
-                    <span class="step-text">Open Easy Pay app on your phone</span>
+                    <span class="step-text">Open Easy Pay app</span>
                 </div>
-                <div class="instruction-step">
+                <div class="step">
                     <span class="step-number">2</span>
-                    <span class="step-text">Tap on "Scan QR" option</span>
+                    <span class="step-text">Tap on "Scan QR"</span>
                 </div>
-                <div class="instruction-step">
+                <div class="step">
                     <span class="step-number">3</span>
                     <span class="step-text">Scan this QR code</span>
                 </div>
-                <div class="instruction-step">
+                <div class="step">
                     <span class="step-number">4</span>
-                    <span class="step-text">Confirm payment amount: <strong id="instructionAmount">₹0</strong></span>
+                    <span class="step-text">Confirm payment amount</span>
                 </div>
             </div>
 
-            <!-- Action Buttons -->
-            <div class="action-buttons" id="actionButtons">
-                <button class="btn btn-primary" onclick="processPayment()">
-                    <span>✅</span> Mark as Paid
+            <div class="action-buttons">
+                <button class="btn btn-success" onclick="markAsPaid()">
+                    <span>✅</span> Confirm Payment
                 </button>
                 <button class="btn btn-secondary" onclick="downloadQR()">
                     <span>⬇️</span> Download QR
@@ -624,23 +508,28 @@
             </div>
         </div>
 
-        <!-- Empty State (Initially Visible) -->
-        <div id="emptyState" class="empty-state">
-            <div class="empty-icon">📱</div>
-            <div class="empty-title">No Order Selected</div>
-            <div class="empty-subtitle">Please select an order from the dropdown above to generate payment QR code</div>
+        <!-- Error State (Initially Hidden) -->
+        <div id="errorState" class="error-message hidden">
+            <div style="font-size: 48px; margin-bottom: 15px;">❌</div>
+            <h3 style="margin-bottom: 10px;">Order Not Found</h3>
+            <p id="errorMessage">Unable to load order details. Please try again.</p>
+            <a href="home.html" class="back-link" style="margin-top: 20px;">← Back to Restaurant</a>
         </div>
 
-        <!-- Back to Restaurant -->
-        <div class="back-button">
-            <a href="home.html" class="back-link">
-                <span>←</span> Back to Restaurant
-            </a>
+        <!-- Success State (Initially Hidden) -->
+        <div id="successState" class="success-message hidden">
+            <div class="success-icon">✅</div>
+            <h3 style="margin-bottom: 10px;">Payment Successful!</h3>
+            <p id="successMessage">Your payment has been recorded.</p>
+            <p style="font-size: 24px; font-weight: 700; margin: 15px 0;" id="successAmount">₹0</p>
+            <a href="home.html" class="btn btn-primary" style="margin-top: 20px; text-decoration: none; display: inline-block;">Return to Restaurant</a>
+        </div>
+
+        <!-- Back Link (Always Visible) -->
+        <div style="text-align: center; margin-top: 20px;">
+            <a href="home.html" class="back-link">← Back to Restaurant</a>
         </div>
     </div>
-
-    <!-- Notification Container -->
-    <div id="notificationContainer"></div>
 
     <script>
         // Firebase configuration
@@ -658,230 +547,109 @@
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
 
-        let currentOrders = [];
-        let selectedOrder = null;
-        let currentQRData = null;
+        let currentOrder = null;
 
-        // Load orders on page load
+        // Load order on page load
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Page loaded, loading orders...');
-            loadOrders();
+            // Get order ID from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderId = urlParams.get('order');
             
-            // Listen for new orders
-            database.ref('orders').on('value', (snapshot) => {
-                console.log('Orders updated, reloading...');
-                loadOrders();
-            });
+            console.log('Order ID from URL:', orderId);
+            
+            if (orderId) {
+                loadOrderFromFirebase(orderId);
+            } else {
+                // Try to get from sessionStorage
+                const storedOrder = EasyPayIO.getStoredOrder();
+                if (storedOrder) {
+                    loadOrderFromFirebase(storedOrder.orderId);
+                } else {
+                    showError('No order selected. Please go back and select an order.');
+                }
+            }
         });
 
-        function showNotification(message, type = 'info') {
-            const container = document.getElementById('notificationContainer');
-            const notification = document.createElement('div');
-            notification.className = `notification ${type}`;
-            notification.innerHTML = message;
-            container.appendChild(notification);
+        function loadOrderFromFirebase(orderId) {
+            showLoading();
             
-            setTimeout(() => {
-                notification.remove();
-            }, 3000);
-        }
-
-        function loadOrders() {
-            console.log('Loading orders from Firebase...');
-            database.ref('orders').orderByChild('timestamp').limitToLast(20).once('value', (snapshot) => {
-                const orders = [];
-                snapshot.forEach((childSnapshot) => {
-                    const order = childSnapshot.val();
-                    console.log('Found order:', order.id, 'Payment:', order.paymentStatus, 'Method:', order.paymentMethod);
+            database.ref('orders/' + orderId).once('value', (snapshot) => {
+                const order = snapshot.val();
+                
+                if (order) {
+                    console.log('Order loaded:', order);
+                    currentOrder = { id: orderId, ...order };
                     
-                    // Only show orders that are pending and use UPI
-                    if (order.paymentStatus !== 'Paid' && 
-                        order.paymentMethod && 
-                        order.paymentMethod.includes('UPI')) {
-                        orders.push({
-                            id: childSnapshot.key,
-                            ...order
-                        });
+                    // Check if this is a UPI order
+                    if (!order.paymentMethod || !order.paymentMethod.includes('UPI')) {
+                        showError('This order is not a UPI payment order.');
+                        return;
                     }
-                });
-                
-                // Sort by timestamp descending (newest first)
-                orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-                currentOrders = orders;
-                
-                console.log('Loaded', orders.length, 'pending UPI orders');
-                updateOrderSelect(orders);
+                    
+                    // Check if already paid
+                    if (order.paymentStatus === 'Paid') {
+                        showAlreadyPaid(order);
+                        return;
+                    }
+                    
+                    displayOrderDetails(currentOrder);
+                    generateQRCode(currentOrder);
+                } else {
+                    showError('Order not found in database.');
+                }
+            }).catch(error => {
+                console.error('Error loading order:', error);
+                showError('Error loading order details.');
             });
         }
 
-        function updateOrderSelect(orders) {
-            const select = document.getElementById('orderSelect');
-            
-            if (orders.length === 0) {
-                select.innerHTML = '<option value="">No pending UPI orders</option>';
-                document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('selectedOrderCard').classList.add('hidden');
-                document.getElementById('qrSection').classList.add('hidden');
-                return;
-            }
-            
-            let options = '<option value="">Select an order...</option>';
-            
-            orders.forEach(order => {
-                const date = new Date(order.timestamp);
-                const timeStr = date.toLocaleTimeString();
-                const orderNumber = order.orderNumber || order.id.slice(-4);
-                const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
-                options += `<option value="${order.id}">#${orderNumber} - ${order.name || 'Guest'} (₹${amount}) - ${timeStr}</option>`;
-            });
-            
-            select.innerHTML = options;
-        }
-
-        function loadSelectedOrder() {
-            const select = document.getElementById('orderSelect');
-            const orderId = select.value;
-            
-            console.log('Selected order ID:', orderId);
-            
-            if (!orderId) {
-                document.getElementById('emptyState').classList.remove('hidden');
-                document.getElementById('selectedOrderCard').classList.add('hidden');
-                document.getElementById('qrSection').classList.add('hidden');
-                return;
-            }
-            
-            selectedOrder = currentOrders.find(o => o.id === orderId);
-            
-            if (selectedOrder) {
-                console.log('Selected order:', selectedOrder);
-                displaySelectedOrder(selectedOrder);
-                generateQRCode(selectedOrder);
-                
-                document.getElementById('emptyState').classList.add('hidden');
-                document.getElementById('selectedOrderCard').classList.remove('hidden');
-                document.getElementById('qrSection').classList.remove('hidden');
-            }
-        }
-
-        function displaySelectedOrder(order) {
+        function displayOrderDetails(order) {
             const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
-            const card = document.getElementById('selectedOrderCard');
-            const date = new Date(order.timestamp);
             
-            // Generate items preview (first 3 items)
-            let itemsPreview = '';
-            const previewItems = order.items.slice(0, 3);
-            previewItems.forEach(item => {
-                itemsPreview += `
-                    <div class="preview-item">
-                        <span class="preview-item-name">${item.name} x${item.quantity}</span>
-                        <span class="preview-item-price">₹${item.price * item.quantity}</span>
-                    </div>
-                `;
-            });
+            document.getElementById('orderNumberDisplay').textContent = `Order #${order.orderNumber || order.id.slice(-4)}`;
+            document.getElementById('customerName').textContent = order.name || 'Guest';
+            document.getElementById('tableNumber').textContent = order.table || 'Takeaway';
+            document.getElementById('totalAmount').textContent = `₹${amount}`;
             
-            if (order.items.length > 3) {
-                itemsPreview += `
-                    <div class="preview-item">
-                        <span class="preview-item-name">and ${order.items.length - 3} more items...</span>
-                        <span class="preview-item-price"></span>
-                    </div>
-                `;
-            }
-            
-            card.innerHTML = `
-                <div class="selected-order-card">
-                    <div class="order-header">
-                        <span class="order-number">Order #${order.orderNumber || order.id.slice(-4)}</span>
-                        <span class="order-status-badge">Pending Payment</span>
-                    </div>
-                    
-                    <div class="customer-info">
-                        <div class="info-item">
-                            <div class="info-label">Customer</div>
-                            <div class="info-value">${order.name || 'Guest'}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Table</div>
-                            <div class="info-value">${order.table || 'Takeaway'}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Time</div>
-                            <div class="info-value">${date.toLocaleTimeString()}</div>
-                        </div>
-                        <div class="info-item">
-                            <div class="info-label">Items</div>
-                            <div class="info-value">${order.items.length}</div>
-                        </div>
-                    </div>
-                    
-                    <div class="items-preview">
-                        <div class="items-title">Order Summary</div>
-                        ${itemsPreview}
-                        <div class="total-amount">
-                            <span class="total-label">Total Amount</span>
-                            <span class="total-value">₹${amount}</span>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            // Update amount displays
-            document.getElementById('amountDisplay').innerHTML = `₹${amount}`;
-            document.getElementById('instructionAmount').innerHTML = `₹${amount}`;
+            // Hide loading, show order details and QR
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('orderDetails').classList.remove('hidden');
+            document.getElementById('qrSection').classList.remove('hidden');
         }
 
         function generateQRCode(order) {
             const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
             
-            console.log('Generating QR code for amount:', amount);
-            
-            // Create unique QR data for EasyPay app
+            // Create QR data
             const qrData = {
                 type: 'upi_payment',
-                version: '2.0',
                 merchant: 'Arabian Nights',
                 orderId: order.id,
                 orderNumber: order.orderNumber || order.id.slice(-4),
                 amount: amount,
                 customer: order.name || 'Guest',
-                table: order.table || 'Takeaway',
-                timestamp: new Date().toISOString(),
-                apiKey: 'ep_4ya7hmnawmlumyxjn',
-                gateway: 'EasyPayIO',
                 upiId: 'arabiannights@okhdfcbank',
-                uniqueId: `${order.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+                timestamp: Date.now(),
+                uniqueId: `${order.id}_${Date.now()}`
             };
             
-            // Convert to string for QR
-            const qrString = JSON.stringify(qrData);
-            currentQRData = qrString;
-            
-            console.log('QR Data:', qrString);
+            const qrContainer = document.getElementById('qrcode');
+            qrContainer.innerHTML = '';
             
             // Generate QR code
-            const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = ''; // Clear previous QR code
-            
-            // Create a new canvas element
-            const canvas = document.createElement('canvas');
-            
-            QRCode.toCanvas(canvas, qrString, {
+            QRCode.toCanvas(document.createElement('canvas'), JSON.stringify(qrData), {
                 width: 220,
                 margin: 2,
                 color: {
                     dark: '#4f46e5',
                     light: '#ffffff'
                 }
-            }, function(err) {
+            }, function(err, canvas) {
                 if (err) {
-                    console.error('QR Code generation error:', err);
-                    qrContainer.innerHTML = '<p style="color: red; padding: 40px;">Error generating QR code. Please try again.</p>';
+                    console.error('QR Error:', err);
+                    qrContainer.innerHTML = '<p style="color: red;">Error generating QR</p>';
                     return;
                 }
-                
-                console.log('QR code generated successfully');
                 
                 // Style the canvas
                 const finalCanvas = document.createElement('canvas');
@@ -889,14 +657,11 @@
                 finalCanvas.height = 250;
                 const ctx = finalCanvas.getContext('2d');
                 
-                // White background
                 ctx.fillStyle = '#ffffff';
                 ctx.fillRect(0, 0, 250, 250);
-                
-                // Draw QR code
                 ctx.drawImage(canvas, 15, 15, 220, 220);
                 
-                // Add EasyPay logo overlay
+                // Add logo
                 ctx.fillStyle = 'rgba(79, 70, 229, 0.1)';
                 ctx.beginPath();
                 ctx.arc(125, 125, 30, 0, 2 * Math.PI);
@@ -907,79 +672,78 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('EP', 125, 130);
                 
-                // Clear container and append the styled canvas
                 qrContainer.innerHTML = '';
                 qrContainer.appendChild(finalCanvas);
-                
-                showNotification('✅ QR code generated for order #' + (order.orderNumber || order.id.slice(-4)), 'success');
             });
         }
 
-        function processPayment() {
-            if (!selectedOrder) {
-                showNotification('❌ Please select an order first', 'error');
-                return;
-            }
-
-            const amount = selectedOrder.totalAmount || parseInt(selectedOrder.total.replace('₹', ''));
+        function markAsPaid() {
+            if (!currentOrder) return;
             
-            // Update order status in Firebase
-            database.ref('orders/' + selectedOrder.id).update({
+            const amount = currentOrder.totalAmount || parseInt(currentOrder.total.replace('₹', ''));
+            
+            // Update Firebase
+            database.ref('orders/' + currentOrder.id).update({
                 paymentStatus: 'Paid',
                 status: 'Confirmed',
                 paidAt: new Date().toISOString()
             }).then(() => {
-                console.log('Payment status updated successfully');
+                // Clear stored order
+                EasyPayIO.clearStoredOrder();
                 
-                // Show success message
-                const qrSection = document.getElementById('qrSection');
-                qrSection.innerHTML = `
-                    <div class="success-message">
-                        <div class="success-icon">✅</div>
-                        <h3 style="margin-bottom: 10px;">Payment Successful!</h3>
-                        <p style="margin-bottom: 5px;">Order #${selectedOrder.orderNumber || selectedOrder.id.slice(-4)}</p>
-                        <p style="font-size: 24px; font-weight: 700; color: #065f46;">₹${amount}</p>
-                        <p style="margin-top: 15px; font-size: 14px;">The kitchen has been notified</p>
-                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">Pay Another Order</button>
-                    </div>
-                `;
+                // Show success state
+                document.getElementById('orderDetails').classList.add('hidden');
+                document.getElementById('qrSection').classList.add('hidden');
+                document.getElementById('successState').classList.remove('hidden');
+                document.getElementById('successMessage').textContent = `Order #${currentOrder.orderNumber || currentOrder.id.slice(-4)} paid successfully!`;
+                document.getElementById('successAmount').textContent = `₹${amount}`;
                 
-                showNotification('✅ Payment recorded successfully!', 'success');
-                
-                // Reload orders after 3 seconds
-                setTimeout(() => {
-                    loadOrders();
-                    document.getElementById('orderSelect').value = '';
-                    document.getElementById('emptyState').classList.remove('hidden');
-                    document.getElementById('selectedOrderCard').classList.add('hidden');
-                }, 3000);
+                // Trigger callback if exists
+                EasyPayIO.triggerPaymentSuccess(currentOrder.id, {
+                    amount: amount,
+                    orderId: currentOrder.id
+                });
             }).catch(error => {
-                console.error('Error updating payment status:', error);
-                showNotification('❌ Error updating payment status', 'error');
+                console.error('Error updating payment:', error);
+                alert('Error updating payment status. Please try again.');
             });
         }
 
-        function downloadQR() {
-            if (!currentQRData || !selectedOrder) {
-                showNotification('❌ Please generate a QR code first', 'error');
-                return;
-            }
+        function showAlreadyPaid(order) {
+            const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
             
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('successState').classList.remove('hidden');
+            document.getElementById('successMessage').textContent = `Order #${order.orderNumber || order.id.slice(-4)} was already paid.`;
+            document.getElementById('successAmount').textContent = `₹${amount}`;
+        }
+
+        function downloadQR() {
             const canvas = document.querySelector('#qrcode canvas');
-            if (canvas) {
+            if (canvas && currentOrder) {
                 const link = document.createElement('a');
-                link.download = `easypay-${selectedOrder.orderNumber || selectedOrder.id.slice(-4)}.png`;
+                link.download = `easypay-${currentOrder.orderNumber || currentOrder.id.slice(-4)}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
-                showNotification('✅ QR code downloaded', 'success');
-            } else {
-                showNotification('❌ No QR code to download', 'error');
             }
         }
 
-        // Make functions globally available
-        window.loadSelectedOrder = loadSelectedOrder;
-        window.processPayment = processPayment;
+        function showLoading() {
+            document.getElementById('loadingState').classList.remove('hidden');
+            document.getElementById('orderDetails').classList.add('hidden');
+            document.getElementById('qrSection').classList.add('hidden');
+            document.getElementById('errorState').classList.add('hidden');
+            document.getElementById('successState').classList.add('hidden');
+        }
+
+        function showError(message) {
+            document.getElementById('loadingState').classList.add('hidden');
+            document.getElementById('errorState').classList.remove('hidden');
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        // Make functions global
+        window.markAsPaid = markAsPaid;
         window.downloadQR = downloadQR;
     </script>
 </body>
