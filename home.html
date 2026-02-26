@@ -8,8 +8,9 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    
-    <!-- Easy PayIO Gateway SDK (Updated Redirect Version) -->
+    <!-- QR Code Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+    <!-- Easy PayIO Gateway SDK -->
     <script src="easypayio-gateway.js"></script>
     
     <style>
@@ -203,29 +204,209 @@
             font-weight: 500;
         }
 
-        /* QR Navigation Button */
-        .qr-nav-btn {
+        /* QR Code Popup Modal */
+        .qr-modal {
+            display: none;
             position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 2000;
             align-items: center;
-            gap: 10px;
+            justify-content: center;
+        }
+
+        .qr-modal.active {
+            display: flex;
+        }
+
+        .qr-modal-content {
+            background: white;
+            border-radius: 30px;
+            padding: 30px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            animation: modalPop 0.3s ease;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.5);
+        }
+
+        @keyframes modalPop {
+            from {
+                transform: scale(0.8);
+                opacity: 0;
+            }
+            to {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
+
+        .qr-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .qr-modal-header h3 {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            margin: 0;
+        }
+
+        .qr-modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
             transition: all 0.3s;
         }
 
-        .qr-nav-btn:hover {
+        .qr-modal-close:hover {
+            color: var(--error);
+            transform: scale(1.2);
+        }
+
+        .qr-display {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 20px;
+            margin: 20px 0;
+        }
+
+        .qr-display canvas {
+            width: 250px !important;
+            height: 250px !important;
+            margin: 0 auto;
+            display: block;
+        }
+
+        .qr-amount {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gold);
+            margin: 15px 0;
+        }
+
+        .qr-order-details {
+            background: #f1f5f9;
+            padding: 15px;
+            border-radius: 12px;
+            margin: 15px 0;
+            text-align: left;
+        }
+
+        .qr-detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px dashed #cbd5e1;
+        }
+
+        .qr-detail-row:last-child {
+            border-bottom: none;
+        }
+
+        .qr-label {
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        .qr-value {
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .qr-app-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: #f3f4f6;
+            padding: 15px;
+            border-radius: 40px;
+            margin: 20px 0;
+        }
+
+        .qr-app-icon {
+            width: 40px;
+            height: 40px;
             background: var(--gold);
-            transform: scale(1.05);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 20px;
+        }
+
+        .qr-app-text {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .qr-app-text small {
+            color: #6b7280;
+            font-size: 12px;
+            font-weight: 400;
+            display: block;
+        }
+
+        .qr-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .qr-btn {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .qr-btn-primary {
+            background: var(--gold);
+            color: white;
+        }
+
+        .qr-btn-primary:hover {
+            background: #92400e;
+            transform: translateY(-2px);
+        }
+
+        .qr-btn-secondary {
+            background: #f1f5f9;
+            color: var(--primary);
+        }
+
+        .qr-btn-secondary:hover {
+            background: #e2e8f0;
+        }
+
+        .secure-badge {
+            color: var(--success);
+            font-size: 14px;
+            font-weight: 500;
+            margin-top: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
         }
 
         /* Order Tracking */
@@ -270,6 +451,33 @@
             background: #fff3cd;
             color: #856404;
         }
+        
+        /* QR Code Button in Tracking */
+        .qr-code-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            margin-left: 15px;
+        }
+
+        .qr-code-btn:hover {
+            background: var(--gold);
+            transform: scale(1.05);
+        }
+
+        .qr-code-btn i {
+            font-size: 1.2rem;
+        }
+
         .timer-display {
             text-align: center;
             padding: 30px;
@@ -442,10 +650,19 @@
     <p>TRADITION IN EVERY BITE</p>
 </header>
 
-<!-- QR Navigation Button -->
-<button class="qr-nav-btn" onclick="goToQRPage()">
-    <span>📱</span> QR Payment Page
-</button>
+<!-- QR Code Modal Popup -->
+<div class="qr-modal" id="qrModal">
+    <div class="qr-modal-content">
+        <div class="qr-modal-header">
+            <h3>Easy Pay IO - QR Code</h3>
+            <button class="qr-modal-close" onclick="closeQRModal()">×</button>
+        </div>
+        
+        <div id="qrModalContent">
+            <!-- QR code will be generated here dynamically -->
+        </div>
+    </div>
+</div>
 
 <div class="container">
     <div id="login-page" class="page active-page" style="text-align: center;">
@@ -513,8 +730,7 @@
 
         <div style="margin-top: 30px; padding: 20px; background: #e6f0ff; border-radius: 12px; border-left: 4px solid var(--info);">
             <p style="margin:0; color: #1e40af; font-size: 0.95rem;">
-                <strong>ℹ️ Note:</strong> For online payments, you'll be redirected to our secure QR payment page. 
-                Scan the QR code with the Easy Pay app to complete payment.
+                <strong>ℹ️ Note:</strong> Your order will be prepared immediately. You can view and scan the QR code for payment in the tracking page.
             </p>
         </div>
 
@@ -619,10 +835,8 @@
         
         if (paymentStatus === 'success') {
             showToast('Payment successful! Your order has been confirmed.', 'success');
-            // Clear URL parameters
             window.history.replaceState({}, document.title, window.location.pathname);
             
-            // Show success message if we have order info
             if (currentOrderId) {
                 document.getElementById('success-msg').innerHTML = `Order confirmed!`;
                 document.getElementById('payment-info').innerHTML = `✅ Payment of ₹${amount || '0'} received successfully. Your food will be served shortly!`;
@@ -658,7 +872,6 @@
         
         if(!name) return alert("Please enter your name");
         
-        // Validate table number if provided
         if (table) {
             const tableNum = parseInt(table);
             if (tableNum < 1 || tableNum > 20) {
@@ -695,7 +908,6 @@
         
         grid.innerHTML = "";
         
-        // Filter items based on search
         let itemsToShow = menuData[currentCat];
         if (searchTerm) {
             itemsToShow = itemsToShow.filter(item => 
@@ -735,11 +947,10 @@
         if (newQty <= 0) delete cart[id];
         else cart[id] = newQty;
 
-        // Update total count
         const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
         document.getElementById('count').innerText = totalItems;
        
-        render(); // Refresh the list to show new buttons
+        render();
     }
 
     function showCart() {
@@ -790,13 +1001,11 @@
             return;
         }
         
-        // Calculate total
         const total = Object.keys(cart).reduce((sum, id) => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
             return sum + (item.price * cart[id]);
         }, 0);
 
-        // Create order object
         const orderItems = [];
         Object.keys(cart).forEach(id => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
@@ -810,7 +1019,6 @@
             });
         });
 
-        // Create order
         const order = {
             id: Date.now(),
             orderNumber: Math.floor(1000 + Math.random() * 9000),
@@ -828,32 +1036,27 @@
             notified: false
         };
 
-        // Initialize item status
         order.items.forEach(item => {
             order.itemStatus[item.id] = 'pending';
         });
 
         try {
-            // Save to Firebase
             await database.ref('orders/' + order.id).set(order);
             
-            // Store current order ID
             currentOrderId = order.id;
-
+            cart = {};
+            document.getElementById('count').innerText = "0";
+            
             if (selectedPaymentMethod === "upi") {
-                // Redirect to QR page for UPI payment
-                window.location.href = `qr-page.html?amount=${total}&product=Arabian%20Nights%20Order&orderId=${order.id}`;
+                document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
+                document.getElementById('payment-info').innerHTML = `📱 Please go to Track Order to view and scan the QR code for payment.`;
             } else {
-                // Cash payment - stay on page
-                cart = {};
-                document.getElementById('count').innerText = "0";
-                
                 document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
                 document.getElementById('payment-info').innerHTML = `💰 Please pay ₹${total} in cash at the counter after your meal. Enjoy your dining!`;
-                
-                showPage('success-page');
-                document.getElementById('cart-btn').style.display = 'none';
             }
+            
+            showPage('success-page');
+            document.getElementById('cart-btn').style.display = 'none';
         } catch (error) {
             console.error("Error saving order: ", error);
             alert("There was an error placing your order. Please try again.");
@@ -871,7 +1074,6 @@
             return;
         }
 
-        // Set up real-time listener for this order
         if (currentOrderRef) {
             currentOrderRef.off();
         }
@@ -890,7 +1092,6 @@
     function renderTrackingPage(order) {
         const content = document.getElementById('tracking-content');
         
-        // Calculate ready items count
         let readyItems = 0;
         if (order.itemStatus) {
             readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
@@ -898,10 +1099,8 @@
         const totalItems = order.items.length;
         const allReady = readyItems === totalItems && totalItems > 0;
         
-        // Calculate progress based on ready items
         let progressWidth = totalItems > 0 ? (readyItems / totalItems) * 100 : 0;
         
-        // Determine status class and text
         let statusClass = "order-status";
         let statusText = order.status;
         
@@ -917,7 +1116,6 @@
             statusClass += " pending";
         }
         
-        // Build items list
         let itemsHtml = "";
         order.items.forEach(item => {
             const itemStatus = order.itemStatus ? order.itemStatus[item.id] : 'pending';
@@ -934,7 +1132,6 @@
             `;
         });
         
-        // Show ENJOY YOUR FOOD card if all items are ready
         let enjoyCard = "";
         if (allReady) {
             enjoyCard = `
@@ -951,6 +1148,12 @@
             `;
         }
         
+        // Add QR Code button for UPI orders
+        const qrButton = order.paymentMethod.includes('UPI') ? 
+            `<button class="qr-code-btn" onclick="showQRCode('${order.id}')">
+                <i>📱</i> Show Payment QR Code
+            </button>` : '';
+        
         content.innerHTML = `
             <div class="tracking-card">
                 <div class="order-header">
@@ -958,7 +1161,10 @@
                         <div class="order-id">Order #${order.orderNumber}</div>
                         <div>Table: ${order.table} | ${order.name}</div>
                     </div>
-                    <div class="${statusClass}">${statusText}</div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div class="${statusClass}">${statusText}</div>
+                        ${qrButton}
+                    </div>
                 </div>
                 
                 ${enjoyCard}
@@ -989,6 +1195,141 @@
                 </button>
             </div>
         `;
+    }
+
+    function showQRCode(orderId) {
+        database.ref('orders/' + orderId).once('value', (snapshot) => {
+            const order = snapshot.val();
+            if (order) {
+                generateQRCodePopup(order);
+            }
+        });
+    }
+
+    function generateQRCodePopup(order) {
+        const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
+        
+        // Create unique QR data for EasyPay app
+        const qrData = {
+            type: 'payment_request',
+            version: '1.0',
+            merchant: 'Arabian Nights',
+            orderId: order.id,
+            orderNumber: order.orderNumber,
+            amount: amount,
+            customer: order.name,
+            table: order.table,
+            items: order.items.map(item => ({
+                name: item.name,
+                quantity: item.quantity,
+                price: item.price
+            })),
+            timestamp: new Date().toISOString(),
+            apiKey: 'ep_4ya7hmnawmlumyxjn',
+            gateway: 'EasyPayIO',
+            uniqueId: `${order.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+        };
+        
+        const qrString = JSON.stringify(qrData);
+        
+        // Generate QR code
+        QRCode.toCanvas(document.createElement('canvas'), qrString, {
+            width: 250,
+            margin: 2,
+            color: {
+                dark: '#0f172a',
+                light: '#ffffff'
+            }
+        }, function(err, canvas) {
+            if (err) {
+                console.error(err);
+                showToast('Error generating QR code', 'error');
+                return;
+            }
+            
+            // Style the canvas
+            const finalCanvas = document.createElement('canvas');
+            finalCanvas.width = 280;
+            finalCanvas.height = 280;
+            const ctx = finalCanvas.getContext('2d');
+            
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, 280, 280);
+            ctx.drawImage(canvas, 15, 15, 250, 250);
+            
+            // Add EasyPay logo overlay
+            ctx.fillStyle = 'rgba(180, 83, 9, 0.1)';
+            ctx.beginPath();
+            ctx.arc(140, 140, 30, 0, 2 * Math.PI);
+            ctx.fill();
+            
+            ctx.font = 'bold 14px Poppins';
+            ctx.fillStyle = '#b45309';
+            ctx.textAlign = 'center';
+            ctx.fillText('EP', 140, 145);
+            
+            // Display in modal
+            const modalContent = document.getElementById('qrModalContent');
+            modalContent.innerHTML = `
+                <div class="qr-display">
+                    ${finalCanvas.outerHTML}
+                </div>
+                <div class="qr-amount">₹${amount}</div>
+                <div class="qr-order-details">
+                    <div class="qr-detail-row">
+                        <span class="qr-label">Order #</span>
+                        <span class="qr-value">${order.orderNumber}</span>
+                    </div>
+                    <div class="qr-detail-row">
+                        <span class="qr-label">Customer</span>
+                        <span class="qr-value">${order.name}</span>
+                    </div>
+                    <div class="qr-detail-row">
+                        <span class="qr-label">Table</span>
+                        <span class="qr-value">${order.table}</span>
+                    </div>
+                    <div class="qr-detail-row">
+                        <span class="qr-label">Items</span>
+                        <span class="qr-value">${order.items.length}</span>
+                    </div>
+                </div>
+                <div class="qr-app-info">
+                    <div class="qr-app-icon">E</div>
+                    <div class="qr-app-text">
+                        Easy Pay App
+                        <small>Scan with Easy Pay app to pay</small>
+                    </div>
+                </div>
+                <div class="qr-actions">
+                    <button class="qr-btn qr-btn-secondary" onclick="downloadQRCode('${order.id}', ${amount})">
+                        ⬇️ Download
+                    </button>
+                    <button class="qr-btn qr-btn-primary" onclick="closeQRModal()">
+                        Done
+                    </button>
+                </div>
+                <div class="secure-badge">
+                    <span>🔒</span> Safe · Secure · Instant
+                </div>
+            `;
+            
+            // Show modal
+            document.getElementById('qrModal').classList.add('active');
+        });
+    }
+
+    function downloadQRCode(orderId, amount) {
+        const canvas = document.querySelector('#qrModalContent canvas');
+        if (canvas) {
+            const link = document.createElement('a');
+            link.download = `easypay-order-${orderId.slice(-8)}-₹${amount}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+    }
+
+    function closeQRModal() {
+        document.getElementById('qrModal').classList.remove('active');
     }
 
     function refreshTracking() {
@@ -1028,10 +1369,6 @@
         }
     }
 
-    function goToQRPage() {
-        window.location.href = 'qr-page.html';
-    }
-
     // Make functions globally available
     window.handleLogin = handleLogin;
     window.updateQty = updateQty;
@@ -1043,7 +1380,9 @@
     window.goBackToRestaurant = goBackToRestaurant;
     window.showPage = showPage;
     window.refreshTracking = refreshTracking;
-    window.goToQRPage = goToQRPage;
+    window.showQRCode = showQRCode;
+    window.closeQRModal = closeQRModal;
+    window.downloadQRCode = downloadQRCode;
 </script>
 </body>
 </html>
