@@ -30,14 +30,13 @@
         }
 
         .qr-container {
-            max-width: 480px;
+            max-width: 500px;
             width: 100%;
             background: white;
             border-radius: 40px;
             padding: 30px 25px;
             box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
             animation: slideUp 0.5s ease;
-            border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         @keyframes slideUp {
@@ -61,7 +60,6 @@
             font-weight: 700;
             color: #0f172a;
             margin-bottom: 8px;
-            letter-spacing: -0.5px;
         }
 
         .header .subtitle {
@@ -80,7 +78,6 @@
             margin-top: 10px;
         }
 
-        /* Order Selector */
         .order-selector {
             margin-bottom: 25px;
         }
@@ -120,7 +117,6 @@
             box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
         }
 
-        /* Selected Order Card */
         .selected-order-card {
             background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
             border-radius: 24px;
@@ -235,7 +231,6 @@
             font-size: 24px;
         }
 
-        /* QR Code Section */
         .qr-section {
             background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
             border-radius: 30px;
@@ -282,9 +277,14 @@
             margin-bottom: 15px;
             box-shadow: 0 10px 30px rgba(79, 70, 229, 0.2);
             border: 2px solid #e0e7ff;
+            min-height: 250px;
+            min-width: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        #qrcode canvas, #qrcode img {
+        #qrcode canvas {
             width: 220px !important;
             height: 220px !important;
             display: block;
@@ -296,12 +296,6 @@
             font-weight: 700;
             color: #4f46e5;
             margin: 15px 0 10px;
-        }
-
-        .amount-display small {
-            font-size: 16px;
-            color: #64748b;
-            font-weight: 400;
         }
 
         .secure-badge {
@@ -318,11 +312,6 @@
             border-radius: 40px;
         }
 
-        .secure-badge i {
-            font-size: 18px;
-        }
-
-        /* App Info */
         .app-info {
             display: flex;
             align-items: center;
@@ -362,66 +351,6 @@
             margin-top: 4px;
         }
 
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            margin: 25px 0 15px;
-        }
-
-        .btn {
-            flex: 1;
-            padding: 16px;
-            border: none;
-            border-radius: 20px;
-            font-weight: 600;
-            font-size: 16px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #4f46e5, #6366f1);
-            color: white;
-            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
-        }
-
-        .btn-primary:active {
-            transform: translateY(0);
-        }
-
-        .btn-secondary {
-            background: #f1f5f9;
-            color: #334155;
-            border: 2px solid #e2e8f0;
-        }
-
-        .btn-secondary:hover {
-            background: #e2e8f0;
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: #059669;
-            color: white;
-            box-shadow: 0 6px 12px rgba(5, 150, 105, 0.3);
-        }
-
-        .btn-success:hover {
-            background: #047857;
-            transform: translateY(-2px);
-        }
-
-        /* Payment Instructions */
         .payment-instructions {
             background: #e0e7ff;
             border-radius: 20px;
@@ -469,47 +398,52 @@
             font-weight: 500;
         }
 
-        /* Loading State */
-        .loading-state {
-            text-align: center;
-            padding: 40px;
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin: 25px 0 15px;
         }
 
-        .loading-spinner {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            width: 50px;
-            height: 50px;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-
-        /* Success Message */
-        .success-message {
-            background: #d1fae5;
-            border: 2px solid #059669;
+        .btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
             border-radius: 20px;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-            color: #065f46;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        .success-icon {
-            font-size: 48px;
-            margin-bottom: 10px;
+        .btn-primary {
+            background: linear-gradient(135deg, #4f46e5, #6366f1);
+            color: white;
+            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
         }
 
-        /* Empty State */
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 24px rgba(79, 70, 229, 0.4);
+        }
+
+        .btn-secondary {
+            background: #f1f5f9;
+            color: #334155;
+            border: 2px solid #e2e8f0;
+        }
+
+        .btn-secondary:hover {
+            background: #e2e8f0;
+            transform: translateY(-2px);
+        }
+
         .empty-state {
             text-align: center;
-            padding: 40px 20px;
+            padding: 60px 20px;
             background: #f8fafc;
             border-radius: 30px;
             margin: 20px 0;
@@ -525,6 +459,7 @@
             font-weight: 600;
             color: #334155;
             margin-bottom: 8px;
+            font-size: 18px;
         }
 
         .empty-subtitle {
@@ -532,7 +467,6 @@
             font-size: 14px;
         }
 
-        /* Back Button */
         .back-button {
             text-align: center;
             margin-top: 20px;
@@ -557,7 +491,6 @@
             background: #e0e7ff;
         }
 
-        /* Notification */
         .notification {
             position: fixed;
             top: 20px;
@@ -590,41 +523,59 @@
                 opacity: 1;
             }
         }
+
+        .success-message {
+            background: #d1fae5;
+            border: 2px solid #059669;
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            text-align: center;
+            color: #065f46;
+        }
+
+        .success-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
-    <div class="qr-container" id="mainContainer">
+    <div class="qr-container">
         <div class="header">
             <h1>Easy Pay IO</h1>
             <div class="subtitle">UPI QR Payment Gateway</div>
-            <div class="upi-badge">🔷 UPI ONLY</div>
+            <div class="upi-badge">UPI ONLY</div>
         </div>
 
         <!-- Order Selection -->
         <div class="order-selector">
             <label>📋 Select Order to Pay</label>
             <select id="orderSelect" onchange="loadSelectedOrder()">
-                <option value="">Choose an order...</option>
+                <option value="">Select an order...</option>
             </select>
         </div>
 
         <!-- Selected Order Card (Initially Hidden) -->
-        <div id="selectedOrderCard" style="display: none;">
-            <!-- Content will be populated dynamically -->
-        </div>
+        <div id="selectedOrderCard" class="hidden"></div>
 
-        <!-- QR Code Section (Initially Hidden) -->
-        <div id="qrSection" style="display: none;">
+        <!-- QR Section (Initially Hidden) -->
+        <div id="qrSection" class="hidden">
             <div class="qr-section">
                 <div class="qr-title">
                     Scan QR to Pay
                 </div>
                 <div id="qrcode">
-                    <!-- QR code will be generated here -->
+                    <div style="padding: 40px; color: #9ca3af;">
+                        <div style="font-size: 48px; margin-bottom: 10px;">📱</div>
+                        <div>Generating QR code...</div>
+                    </div>
                 </div>
-                <div class="amount-display" id="amountDisplay">
-                    ₹0
-                </div>
+                <div class="amount-display" id="amountDisplay">₹0</div>
                 <div class="secure-badge">
                     <span>🔒</span> Safe · Secure · Instant
                 </div>
@@ -713,10 +664,12 @@
 
         // Load orders on page load
         document.addEventListener('DOMContentLoaded', function() {
+            console.log('Page loaded, loading orders...');
             loadOrders();
             
             // Listen for new orders
             database.ref('orders').on('value', (snapshot) => {
+                console.log('Orders updated, reloading...');
                 loadOrders();
             });
         });
@@ -734,12 +687,17 @@
         }
 
         function loadOrders() {
+            console.log('Loading orders from Firebase...');
             database.ref('orders').orderByChild('timestamp').limitToLast(20).once('value', (snapshot) => {
                 const orders = [];
                 snapshot.forEach((childSnapshot) => {
                     const order = childSnapshot.val();
-                    // Only show orders that are pending and not paid
-                    if (order.paymentStatus !== 'Paid' && order.paymentMethod?.includes('UPI')) {
+                    console.log('Found order:', order.id, 'Payment:', order.paymentStatus, 'Method:', order.paymentMethod);
+                    
+                    // Only show orders that are pending and use UPI
+                    if (order.paymentStatus !== 'Paid' && 
+                        order.paymentMethod && 
+                        order.paymentMethod.includes('UPI')) {
                         orders.push({
                             id: childSnapshot.key,
                             ...order
@@ -751,6 +709,7 @@
                 orders.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
                 currentOrders = orders;
                 
+                console.log('Loaded', orders.length, 'pending UPI orders');
                 updateOrderSelect(orders);
             });
         }
@@ -760,9 +719,9 @@
             
             if (orders.length === 0) {
                 select.innerHTML = '<option value="">No pending UPI orders</option>';
-                document.getElementById('emptyState').style.display = 'block';
-                document.getElementById('selectedOrderCard').style.display = 'none';
-                document.getElementById('qrSection').style.display = 'none';
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('selectedOrderCard').classList.add('hidden');
+                document.getElementById('qrSection').classList.add('hidden');
                 return;
             }
             
@@ -772,7 +731,7 @@
                 const date = new Date(order.timestamp);
                 const timeStr = date.toLocaleTimeString();
                 const orderNumber = order.orderNumber || order.id.slice(-4);
-                const amount = order.totalAmount || order.total.replace('₹', '');
+                const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
                 options += `<option value="${order.id}">#${orderNumber} - ${order.name || 'Guest'} (₹${amount}) - ${timeStr}</option>`;
             });
             
@@ -783,22 +742,25 @@
             const select = document.getElementById('orderSelect');
             const orderId = select.value;
             
+            console.log('Selected order ID:', orderId);
+            
             if (!orderId) {
-                document.getElementById('emptyState').style.display = 'block';
-                document.getElementById('selectedOrderCard').style.display = 'none';
-                document.getElementById('qrSection').style.display = 'none';
+                document.getElementById('emptyState').classList.remove('hidden');
+                document.getElementById('selectedOrderCard').classList.add('hidden');
+                document.getElementById('qrSection').classList.add('hidden');
                 return;
             }
             
             selectedOrder = currentOrders.find(o => o.id === orderId);
             
             if (selectedOrder) {
+                console.log('Selected order:', selectedOrder);
                 displaySelectedOrder(selectedOrder);
                 generateQRCode(selectedOrder);
                 
-                document.getElementById('emptyState').style.display = 'none';
-                document.getElementById('selectedOrderCard').style.display = 'block';
-                document.getElementById('qrSection').style.display = 'block';
+                document.getElementById('emptyState').classList.add('hidden');
+                document.getElementById('selectedOrderCard').classList.remove('hidden');
+                document.getElementById('qrSection').classList.remove('hidden');
             }
         }
 
@@ -873,6 +835,8 @@
         function generateQRCode(order) {
             const amount = order.totalAmount || parseInt(order.total.replace('₹', ''));
             
+            console.log('Generating QR code for amount:', amount);
+            
             // Create unique QR data for EasyPay app
             const qrData = {
                 type: 'upi_payment',
@@ -883,15 +847,10 @@
                 amount: amount,
                 customer: order.name || 'Guest',
                 table: order.table || 'Takeaway',
-                items: order.items.map(item => ({
-                    name: item.name,
-                    quantity: item.quantity,
-                    price: item.price
-                })),
                 timestamp: new Date().toISOString(),
                 apiKey: 'ep_4ya7hmnawmlumyxjn',
                 gateway: 'EasyPayIO',
-                upiId: 'arabiannights@okhdfcbank', // Example UPI ID
+                upiId: 'arabiannights@okhdfcbank',
                 uniqueId: `${order.id}_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
             };
             
@@ -899,23 +858,30 @@
             const qrString = JSON.stringify(qrData);
             currentQRData = qrString;
             
+            console.log('QR Data:', qrString);
+            
             // Generate QR code
             const qrContainer = document.getElementById('qrcode');
-            qrContainer.innerHTML = '';
+            qrContainer.innerHTML = ''; // Clear previous QR code
             
-            QRCode.toCanvas(document.createElement('canvas'), qrString, {
+            // Create a new canvas element
+            const canvas = document.createElement('canvas');
+            
+            QRCode.toCanvas(canvas, qrString, {
                 width: 220,
                 margin: 2,
                 color: {
                     dark: '#4f46e5',
                     light: '#ffffff'
                 }
-            }, function(err, canvas) {
+            }, function(err) {
                 if (err) {
-                    console.error(err);
-                    qrContainer.innerHTML = '<p style="color: red;">Error generating QR code. Please try again.</p>';
+                    console.error('QR Code generation error:', err);
+                    qrContainer.innerHTML = '<p style="color: red; padding: 40px;">Error generating QR code. Please try again.</p>';
                     return;
                 }
+                
+                console.log('QR code generated successfully');
                 
                 // Style the canvas
                 const finalCanvas = document.createElement('canvas');
@@ -941,10 +907,12 @@
                 ctx.textAlign = 'center';
                 ctx.fillText('EP', 125, 130);
                 
+                // Clear container and append the styled canvas
+                qrContainer.innerHTML = '';
                 qrContainer.appendChild(finalCanvas);
+                
+                showNotification('✅ QR code generated for order #' + (order.orderNumber || order.id.slice(-4)), 'success');
             });
-            
-            showNotification('✅ QR code generated for order #' + (order.orderNumber || order.id.slice(-4)), 'success');
         }
 
         function processPayment() {
@@ -961,10 +929,10 @@
                 status: 'Confirmed',
                 paidAt: new Date().toISOString()
             }).then(() => {
+                console.log('Payment status updated successfully');
+                
                 // Show success message
                 const qrSection = document.getElementById('qrSection');
-                const originalContent = qrSection.innerHTML;
-                
                 qrSection.innerHTML = `
                     <div class="success-message">
                         <div class="success-icon">✅</div>
@@ -972,23 +940,18 @@
                         <p style="margin-bottom: 5px;">Order #${selectedOrder.orderNumber || selectedOrder.id.slice(-4)}</p>
                         <p style="font-size: 24px; font-weight: 700; color: #065f46;">₹${amount}</p>
                         <p style="margin-top: 15px; font-size: 14px;">The kitchen has been notified</p>
+                        <button class="btn btn-primary" style="margin-top: 20px;" onclick="location.reload()">Pay Another Order</button>
                     </div>
                 `;
                 
-                // Hide action buttons
-                document.getElementById('actionButtons').style.display = 'none';
-                
                 showNotification('✅ Payment recorded successfully!', 'success');
                 
-                // Reload orders after 2 seconds
+                // Reload orders after 3 seconds
                 setTimeout(() => {
                     loadOrders();
-                    // Reset UI
                     document.getElementById('orderSelect').value = '';
-                    document.getElementById('emptyState').style.display = 'block';
-                    document.getElementById('selectedOrderCard').style.display = 'none';
-                    document.getElementById('qrSection').style.display = 'none';
-                    document.getElementById('actionButtons').style.display = 'flex';
+                    document.getElementById('emptyState').classList.remove('hidden');
+                    document.getElementById('selectedOrderCard').classList.add('hidden');
                 }, 3000);
             }).catch(error => {
                 console.error('Error updating payment status:', error);
@@ -1009,6 +972,8 @@
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 showNotification('✅ QR code downloaded', 'success');
+            } else {
+                showNotification('❌ No QR code to download', 'error');
             }
         }
 
