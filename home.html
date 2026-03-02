@@ -8,7 +8,8 @@
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
-    <!-- Easy PayIO Gateway SDK -->
+    
+    <!-- Easy PayIO Gateway SDK Integration -->
     <script src="easypayio-gateway.js"></script>
     
     <style>
@@ -147,51 +148,7 @@
         .page { display: none; padding: 40px; }
         .active-page { display: block; }
        
-        .cart-trigger { 
-            position: fixed; 
-            bottom: 30px; 
-            right: 30px; 
-            background: var(--gold); 
-            color: white; 
-            padding: 15px 30px; 
-            border-radius: 50px; 
-            cursor: pointer; 
-            font-weight: bold; 
-            z-index: 1000; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            transition: all 0.3s;
-        }
-
-        .cart-trigger:hover {
-            transform: scale(1.05);
-            background: #92400e;
-        }
-
-        /* Staff Link Button */
-        .staff-link {
-            position: fixed;
-            bottom: 30px;
-            left: 30px;
-            background: var(--primary);
-            color: white;
-            border: none;
-            padding: 15px 25px;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: 600;
-            z-index: 1000;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            transition: all 0.3s;
-            text-decoration: none;
-        }
-
-        .staff-link:hover {
-            background: var(--gold);
-            transform: scale(1.05);
-        }
+        .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
 
         /* Payment UI */
         .pay-option { 
@@ -229,14 +186,6 @@
             color: #64748b;
             font-size: 0.9rem;
         }
-        .pay-badge {
-            background: var(--gold);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
         .cash-note {
             background: #fef3c7;
             border-left: 4px solid var(--gold);
@@ -252,25 +201,6 @@
         }
         .cash-note .text {
             font-weight: 500;
-        }
-
-        /* UPI Info Note */
-        .upi-info {
-            background: #e0e7ff;
-            border-left: 4px solid #4f46e5;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .upi-info .icon {
-            font-size: 1.5rem;
-        }
-        .upi-info .text {
-            font-weight: 500;
-            color: #1e40af;
         }
 
         /* Order Tracking */
@@ -315,7 +245,6 @@
             background: #fff3cd;
             color: #856404;
         }
-        
         .timer-display {
             text-align: center;
             padding: 30px;
@@ -380,40 +309,6 @@
             background: var(--gold);
         }
 
-        /* Toast Notification */
-        .toast {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: white;
-            padding: 16px 24px;
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            z-index: 2000;
-            animation: slideIn 0.3s ease;
-            max-width: 350px;
-            border-left: 4px solid var(--info);
-        }
-
-        .toast.success {
-            border-left-color: var(--success);
-        }
-
-        .toast.error {
-            border-left-color: var(--error);
-        }
-
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-
         /* Enjoy Food Card */
         .enjoy-card {
             background: linear-gradient(135deg, #059669, #10b981);
@@ -476,39 +371,6 @@
             font-size: 0.7rem;
             margin-left: 5px;
         }
-
-        /* Loading Spinner */
-        .loading-spinner {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid rgba(255,255,255,0.3);
-            border-radius: 50%;
-            border-top-color: white;
-            animation: spin 1s ease-in-out infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Payment Status Badge */
-        .payment-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            margin-left: 10px;
-        }
-        .payment-pending {
-            background: #fef3c7;
-            color: #92400e;
-        }
-        .payment-paid {
-            background: #d1fae5;
-            color: #065f46;
-        }
     </style>
 </head>
 <body>
@@ -517,11 +379,6 @@
     <h1>ARABIAN NIGHTS</h1>
     <p>TRADITION IN EVERY BITE</p>
 </header>
-
-<!-- Staff Dashboard Link -->
-<a href="stafflogin.html" class="staff-link">
-    <span>👨‍🍳</span> Staff Dashboard
-</a>
 
 <div class="container">
     <div id="login-page" class="page active-page" style="text-align: center;">
@@ -567,21 +424,14 @@
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
-
-        <!-- UPI Info Note -->
-        <div class="upi-info">
-            <span class="icon">📱</span>
-            <span class="text">For UPI payments, staff will show you a QR code to scan</span>
-        </div>
         
-        <!-- UPI Option -->
+        <!-- UPI Option (using Easy PayIO) -->
         <div class="pay-option selected" onclick="selectPayment(this)" data-method="upi">
             <span class="pay-icon">📱</span>
             <div class="pay-details">
                 <div class="pay-title">UPI / Online Payment</div>
-                <div class="pay-description">Pay using Google Pay, PhonePe, etc. - Staff will show QR</div>
+                <div class="pay-description">Pay now using Easy PayIO (Google Pay, PhonePe, etc.)</div>
             </div>
-            <span class="pay-badge">Instant</span>
         </div>
         
         <!-- Cash Option (Pay After Eating) -->
@@ -591,13 +441,13 @@
                 <div class="pay-title">Cash Payment</div>
                 <div class="pay-description">Pay after your meal at the counter (Recommended)</div>
             </div>
-            <span class="pay-badge">Pay Later</span>
+            <span style="background: var(--gold); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Pay Later</span>
         </div>
 
         <div style="margin-top: 30px; padding: 20px; background: #e6f0ff; border-radius: 12px; border-left: 4px solid var(--info);">
             <p style="margin:0; color: #1e40af; font-size: 0.95rem;">
-                <strong>ℹ️ How it works:</strong> After placing your UPI order, please inform the staff. 
-                They will show you a QR code on their device to scan and complete the payment.
+                <strong>ℹ️ Note:</strong> Your order will be prepared immediately. For online payments, 
+                a secure payment window will open. For cash payments, please settle at the counter.
             </p>
         </div>
 
@@ -613,10 +463,7 @@
         <div style="font-size: 80px; color: var(--success);">✓</div>
         <p id="success-msg"></p>
         <p id="payment-info" style="font-size: 1.1rem; background: #f3f4f6; padding: 15px; border-radius: 10px; margin-top: 20px;"></p>
-        <div style="display: flex; gap: 15px; margin-top: 30px; justify-content: center; flex-wrap: wrap;">
-            <button class="btn" style="max-width: 200px;" onclick="trackOrder()">📊 Track Order</button>
-            <button class="btn" style="max-width: 200px; background: var(--gold);" onclick="showPage('menu-page')">🍽️ Order More</button>
-        </div>
+        <button class="btn" style="max-width: 200px; margin-top:30px;" onclick="trackOrder()">📊 Track Order</button>
     </div>
 
     <div id="tracking-page" class="page">
@@ -632,9 +479,6 @@
 
 <div class="cart-trigger" id="cart-btn" onclick="showCart()" style="display: none;">🛒 <span id="count">0</span> Items</div>
 
-<!-- Toast notification container -->
-<div id="toast-container"></div>
-
 <script>
     // Your Firebase configuration
     const firebaseConfig = {
@@ -644,7 +488,8 @@
         projectId: "arabian-nights-cca24",
         storageBucket: "arabian-nights-cca24.firebasestorage.app",
         messagingSenderId: "405951495752",
-        appId: "1:405951495752:web:cedcf446717f9359b2e27d"
+        appId: "1:405951495752:web:cedcf446717f9359b2e27d",
+        measurementId: "G-N6ZC0F2J5V"
     };
 
     // Initialize Firebase
@@ -655,13 +500,13 @@
         "Starters": [
             {id: "s1", name: "Hummus", price: 180, img: "starter1.png"},
             {id: "s2", name: "Falafel", price: 220, img: "starter2.jpg"},
-            {id: "s3", name: "Chicken shawarma", price: 120, img: "starter3.jpg"},
+            {id: "s3", name: "Chicken shawarama", price: 120, img: "starter3.jpg"},
             {id: "s4", name: "Kibbeh", price: 290, img: "starter4.jpg"},
         ],
         "Mains": [
             { id: "m1", name: "Chicken Mandi", price: 480, img: "main1.jpg" },
             { id: "m2", name: "Lamb Kabsa", price: 650, img: "main2.jpeg" },
-            { id: "m3", name: "Chicken Kabsa", price: 420, img: "main3.jpg" },
+            { id: "m3", name: "chicken Kabsa", price: 420, img: "main3.jpg" },
             { id: "m4", name: "Mixed Grill/Platter", price: 590, img: "main4.jpg" },
             { id: "m5", name: "Machboos", price: 720, img: "main5.jpg" },
         ],
@@ -689,52 +534,8 @@
     let trackingInterval = null;
     let currentOrderRef = null;
 
-    // Check for payment return on page load
-    window.addEventListener('load', function() {
-        checkPaymentReturn();
-    });
-
-    function checkPaymentReturn() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const paymentStatus = urlParams.get('payment_status');
-        const orderId = urlParams.get('order_id');
-        
-        if (paymentStatus === 'success' && orderId) {
-            // Load the order and show success
-            database.ref('orders/' + orderId).once('value', (snapshot) => {
-                const order = snapshot.val();
-                if (order) {
-                    currentOrderId = orderId;
-                    showToast('✅ Payment successful! Order confirmed.', 'success');
-                    
-                    document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} payment successful!`;
-                    document.getElementById('payment-info').innerHTML = `✅ Your payment of ${order.total} has been received. Your food will be served shortly!`;
-                    
-                    showPage('success-page');
-                    document.getElementById('cart-btn').style.display = 'none';
-                    
-                    // Clear cart
-                    cart = {};
-                    document.getElementById('count').innerText = "0";
-                    
-                    // Clean URL
-                    window.history.replaceState({}, document.title, window.location.pathname);
-                }
-            });
-        }
-    }
-
-    function showToast(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        const toast = document.createElement('div');
-        toast.className = `toast ${type}`;
-        toast.innerHTML = message;
-        container.appendChild(toast);
-        
-        setTimeout(() => {
-            toast.remove();
-        }, 3000);
-    }
+    // Check if Easy PayIO is loaded
+    console.log('Easy PayIO Gateway available:', typeof EasyPayIO !== 'undefined');
 
     function handleLogin() {
         const name = document.getElementById('user-name').value;
@@ -742,6 +543,7 @@
         
         if(!name) return alert("Please enter your name");
         
+        // Validate table number if provided
         if (table) {
             const tableNum = parseInt(table);
             if (tableNum < 1 || tableNum > 20) {
@@ -778,6 +580,7 @@
         
         grid.innerHTML = "";
         
+        // Filter items based on search
         let itemsToShow = menuData[currentCat];
         if (searchTerm) {
             itemsToShow = itemsToShow.filter(item => 
@@ -817,10 +620,11 @@
         if (newQty <= 0) delete cart[id];
         else cart[id] = newQty;
 
+        // Update total count
         const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
         document.getElementById('count').innerText = totalItems;
        
-        render();
+        render(); // Refresh the list to show new buttons
     }
 
     function showCart() {
@@ -871,16 +675,50 @@
             return;
         }
         
-        // Disable button to prevent double submission
-        const payBtn = document.getElementById('confirm-payment-btn');
-        payBtn.disabled = true;
-        payBtn.innerHTML = '<span class="loading-spinner"></span> Processing...';
-        
+        // Calculate total
         const total = Object.keys(cart).reduce((sum, id) => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
             return sum + (item.price * cart[id]);
         }, 0);
 
+        if (selectedPaymentMethod === "upi") {
+            // Use Easy PayIO for UPI payments
+            try {
+                // Prepare order items for display
+                const orderItems = Object.keys(cart).map(id => {
+                    const item = Object.values(menuData).flat().find(i => i.id === id);
+                    return `${item.name} x${cart[id]}`;
+                }).join(', ');
+
+                // Initiate payment with Easy PayIO
+                EasyPayIO.pay({
+                    amount: total,
+                    productName: 'Arabian Nights Order',
+                    productDescription: orderItems.substring(0, 100), // First 100 chars
+                    userEmail: guestInfo.name + '@customer.com', // Placeholder email
+                    onSuccess: async function(response) {
+                        console.log('Payment successful:', response);
+                        
+                        // Payment succeeded - save order with paid status
+                        await saveOrderToFirebase(total, 'upi', 'Paid');
+                    },
+                    onFailure: function(error) {
+                        console.error('Payment failed:', error);
+                        alert('Payment failed: ' + (error.error || 'Unknown error'));
+                    }
+                });
+            } catch (error) {
+                console.error('Easy PayIO error:', error);
+                alert('Payment gateway error. Please try cash payment option.');
+            }
+        } else {
+            // Cash payment - save order directly
+            await saveOrderToFirebase(total, 'cash', 'Pending');
+        }
+    }
+
+    async function saveOrderToFirebase(total, paymentMethod, paymentStatus) {
+        // Create order object
         const orderItems = [];
         Object.keys(cart).forEach(id => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
@@ -889,28 +727,28 @@
                 name: item.name,
                 price: item.price,
                 quantity: cart[id],
-                category: Object.keys(menuData).find(cat => menuData[cat].some(i => i.id === id))
+                category: Object.keys(menuData).find(cat => menuData[cat].some(i => i.id === id)),
+                time: "Not Set" // Staff will set this
             });
         });
 
-        // Create unique order ID
-        const orderId = Date.now().toString();
-        const orderNumber = Math.floor(1000 + Math.random() * 9000);
-
+        // Create order
         const order = {
-            id: orderId,
-            orderNumber: orderNumber,
+            id: Date.now(),
+            orderNumber: Math.floor(1000 + Math.random() * 9000), // Random 4-digit order number
             name: guestInfo.name,
             table: guestInfo.table,
             items: orderItems,
+            itemStatus: {}, // Will track per-item status
             total: "₹" + total,
             totalAmount: total,
             status: "Pending",
-            paymentMethod: selectedPaymentMethod === "upi" ? "UPI (Online)" : "Cash (Pay at Counter)",
-            paymentStatus: "Pending",
+            paymentMethod: paymentMethod === "upi" ? "UPI (Paid Online)" : "Cash (Pay After Eating)",
+            paymentStatus: paymentStatus,
             timestamp: new Date().toISOString(),
-            itemStatus: {},
-            notified: false // For staff notification
+            estimatedTime: null, // Will be set by staff
+            preparationTime: null, // Staff will add this
+            notified: false
         };
 
         // Initialize item status
@@ -919,7 +757,7 @@
         });
 
         try {
-            // Save to Firebase
+            // Save to Firebase Realtime Database
             await database.ref('orders/' + order.id).set(order);
             
             // Store current order ID
@@ -929,30 +767,22 @@
             cart = {};
             document.getElementById('count').innerText = "0";
 
-            if (selectedPaymentMethod === "upi") {
-                // UPI order - staff will show QR
-                document.getElementById('success-msg').innerHTML = `Order #${orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
-                document.getElementById('payment-info').innerHTML = `📱 Please inform the staff. They will show you a QR code on their device to complete the UPI payment.`;
+            // Show success message with payment info
+            let paymentMessage = "";
+            if (paymentMethod === "upi") {
+                paymentMessage = "✅ Payment successful via UPI. Your food will be served shortly!";
             } else {
-                // Cash payment
-                document.getElementById('success-msg').innerHTML = `Order #${orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
-                document.getElementById('payment-info').innerHTML = `💰 Please pay ₹${total} in cash at the counter after your meal. Enjoy your dining!`;
+                paymentMessage = "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
             }
+            
+            document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
+            document.getElementById('payment-info').innerHTML = paymentMessage;
             
             showPage('success-page');
             document.getElementById('cart-btn').style.display = 'none';
-            
-            // Re-enable button
-            payBtn.disabled = false;
-            payBtn.innerHTML = 'Place Order';
-            
         } catch (error) {
             console.error("Error saving order: ", error);
             alert("There was an error placing your order. Please try again.");
-            
-            // Re-enable button
-            payBtn.disabled = false;
-            payBtn.innerHTML = 'Place Order';
         }
     }
 
@@ -967,8 +797,9 @@
             return;
         }
 
+        // Set up real-time listener for this order
         if (currentOrderRef) {
-            currentOrderRef.off();
+            currentOrderRef.off(); // Remove previous listener
         }
 
         currentOrderRef = database.ref('orders/' + currentOrderId);
@@ -976,6 +807,9 @@
             const order = snapshot.val();
             if (order) {
                 renderTrackingPage(order);
+            } else {
+                alert("Order not found. Please place a new order.");
+                showPage('menu-page');
             }
         });
 
@@ -985,6 +819,7 @@
     function renderTrackingPage(order) {
         const content = document.getElementById('tracking-content');
         
+        // Calculate ready items count
         let readyItems = 0;
         if (order.itemStatus) {
             readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
@@ -992,8 +827,10 @@
         const totalItems = order.items.length;
         const allReady = readyItems === totalItems && totalItems > 0;
         
+        // Calculate progress based on ready items
         let progressWidth = totalItems > 0 ? (readyItems / totalItems) * 100 : 0;
         
+        // Determine status class and text
         let statusClass = "order-status";
         let statusText = order.status;
         
@@ -1009,15 +846,54 @@
             statusClass += " pending";
         }
         
+        // Check if all items have times set
+        const itemsWithTimes = order.items.filter(item => item.time && item.time !== "Not Set");
+        const allTimesSet = itemsWithTimes.length === totalItems;
+        
+        // Calculate estimated time if available
+        let timeDisplay = "";
+        if (order.estimatedTime) {
+            timeDisplay = `
+                <div class="timer-display">
+                    <div class="timer-label">Estimated Preparation Time</div>
+                    <div class="timer">${order.estimatedTime} min</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;">Set by kitchen staff</div>
+                </div>
+            `;
+        } else if (allTimesSet) {
+            // Calculate max time from items
+            const maxTime = Math.max(...itemsWithTimes.map(item => parseInt(item.time) || 0));
+            if (maxTime > 0) {
+                timeDisplay = `
+                    <div class="timer-display">
+                        <div class="timer-label">Estimated Preparation Time</div>
+                        <div class="timer">${maxTime} min</div>
+                        <div style="margin-top: 10px; font-size: 0.9rem;">Based on individual item times</div>
+                    </div>
+                `;
+            }
+        } else {
+            timeDisplay = `
+                <div class="timer-display">
+                    <div class="timer-label">Waiting for kitchen</div>
+                    <div class="timer">--</div>
+                    <div style="margin-top: 10px; font-size: 0.9rem;">Staff will update soon</div>
+                </div>
+            `;
+        }
+        
+        // Build items list with times
         let itemsHtml = "";
         order.items.forEach(item => {
             const itemStatus = order.itemStatus ? order.itemStatus[item.id] : 'pending';
             const isReady = itemStatus === 'ready';
+            const itemTime = item.time && item.time !== "Not Set" ? item.time : '';
             
             itemsHtml += `
                 <div class="order-item ${isReady ? 'ready' : ''}">
                     <span>
                         ${item.name} x${item.quantity}
+                        ${itemTime ? `<span class="item-timing">⏱️ ${itemTime}</span>` : ''}
                         ${isReady ? '<span class="ready-badge">✅ Ready</span>' : ''}
                     </span>
                     <span>₹${item.price * item.quantity}</span>
@@ -1025,6 +901,7 @@
             `;
         });
         
+        // Show ENJOY YOUR FOOD card if all items are ready
         let enjoyCard = "";
         if (allReady) {
             enjoyCard = `
@@ -1041,11 +918,6 @@
             `;
         }
         
-        // Payment status badge
-        const paymentStatusBadge = order.paymentStatus === 'Paid' 
-            ? '<span class="payment-badge payment-paid">✅ Paid</span>'
-            : '<span class="payment-badge payment-pending">⏳ Payment Pending</span>';
-        
         content.innerHTML = `
             <div class="tracking-card">
                 <div class="order-header">
@@ -1053,13 +925,10 @@
                         <div class="order-id">Order #${order.orderNumber}</div>
                         <div>Table: ${order.table} | ${order.name}</div>
                     </div>
-                    <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                        <div class="${statusClass}">${statusText}</div>
-                        ${paymentStatusBadge}
-                    </div>
+                    <div class="${statusClass}">${statusText}</div>
                 </div>
                 
-                ${enjoyCard}
+                ${enjoyCard || timeDisplay}
                 
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: ${progressWidth}%"></div>
@@ -1090,12 +959,12 @@
     }
 
     function refreshTracking() {
+        // No need to manually refresh as Firebase real-time listener handles it
         if (currentOrderRef) {
             currentOrderRef.once('value', (snapshot) => {
                 const order = snapshot.val();
                 if (order) {
                     renderTrackingPage(order);
-                    showToast('Order status updated', 'info');
                 }
             });
         }
@@ -1107,6 +976,7 @@
             trackingInterval = null;
         }
         
+        // Remove Firebase listener
         if (currentOrderRef) {
             currentOrderRef.off();
             currentOrderRef = null;
@@ -1121,23 +991,12 @@
         document.getElementById(id).classList.add('active-page');
         window.scrollTo(0,0);
         
+        // Clear tracking interval if leaving tracking page
         if (id !== 'tracking-page' && trackingInterval) {
             clearInterval(trackingInterval);
             trackingInterval = null;
         }
     }
-
-    // Make functions globally available
-    window.handleLogin = handleLogin;
-    window.updateQty = updateQty;
-    window.showCart = showCart;
-    window.validateAndShowPayment = validateAndShowPayment;
-    window.selectPayment = selectPayment;
-    window.processPayment = processPayment;
-    window.trackOrder = trackOrder;
-    window.goBackToRestaurant = goBackToRestaurant;
-    window.showPage = showPage;
-    window.refreshTracking = refreshTracking;
 </script>
 </body>
 </html>
