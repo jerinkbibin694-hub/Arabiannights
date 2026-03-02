@@ -702,10 +702,6 @@
                         // Payment succeeded - save order with paid status
                         await saveOrderToFirebase(total, 'upi', 'Paid');
                     },
-                    onFailure: function(error) {
-                        console.error('Payment failed:', error);
-                        alert('Payment failed: ' + (error.error || 'Unknown error'));
-                    }
                 });
             } catch (error) {
                 console.error('Easy PayIO error:', error);
