@@ -39,9 +39,58 @@
             background: linear-gradient(to bottom, rgba(2, 6, 23, 0.92), rgba(2, 6, 23, 0.7));
             color: var(--cream);
             border-bottom: 5px solid var(--gold);
+            position: relative;
         }
 
-        header h1 { font-family: 'Playfair Display', serif; font-size: 3.5rem; margin: 0; letter-spacing: 5px; text-transform: uppercase; }
+        header h1 { 
+            font-family: 'Playfair Display', serif; 
+            font-size: 3.5rem; 
+            margin: 0; 
+            letter-spacing: 5px; 
+            text-transform: uppercase; 
+        }
+
+        /* Portal Links */
+        .portal-links {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .portal-link {
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .portal-link.admin {
+            background: #b45309;
+            color: white;
+        }
+
+        .portal-link.staff {
+            background: #059669;
+            color: white;
+        }
+
+        .portal-link:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.3);
+        }
+
+        .portal-link.admin:hover {
+            background: #92400e;
+        }
+
+        .portal-link.staff:hover {
+            background: #047857;
+        }
 
         .container {
             max-width: 1200px;
@@ -371,6 +420,52 @@
             font-size: 0.7rem;
             margin-left: 5px;
         }
+
+        /* Table Booking Link */
+        .booking-link {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 30px;
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            transition: all 0.3s;
+        }
+
+        .booking-link:hover {
+            background: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2rem;
+            }
+            
+            .portal-links {
+                position: static;
+                margin-top: 20px;
+                justify-content: center;
+            }
+            
+            .booking-link {
+                position: static;
+                margin-top: 20px;
+                justify-content: center;
+                width: fit-content;
+                margin-left: auto;
+                margin-right: auto;
+            }
+        }
     </style>
 </head>
 <body>
@@ -378,6 +473,17 @@
 <header>
     <h1>ARABIAN NIGHTS</h1>
     <p>TRADITION IN EVERY BITE</p>
+    
+    <!-- Booking Link -->
+    <a href="tablebooking.html" class="booking-link">
+        <span>📅</span> Book a Table
+    </a>
+    
+    <!-- Portal Links -->
+    <div class="portal-links">
+        <a href="admin-login.html" class="portal-link admin">👑 Admin</a>
+        <a href="staff-login.html" class="portal-link staff">👨‍🍳 Staff</a>
+    </div>
 </header>
 
 <div class="container">
@@ -388,6 +494,10 @@
             <input type="number" id="table-number" placeholder="Table Number (1-20)" min="1" max="20">
             <button class="btn" style="margin-top: 20px;" onclick="handleLogin()">Enter Restaurant</button>
         </div>
+        <p style="margin-top: 20px; color: #64748b;">
+            <small>👑 Admin? <a href="admin-login.html" style="color: var(--gold);">Click here</a> | 
+            👨‍🍳 Staff? <a href="staff-login.html" style="color: var(--success);">Click here</a></small>
+        </p>
     </div>
 
     <div id="menu-page" class="page" style="padding:0">
@@ -500,14 +610,14 @@
         "Starters": [
             {id: "s1", name: "Hummus", price: 180, img: "starter1.png"},
             {id: "s2", name: "Falafel", price: 220, img: "starter2.jpg"},
-            {id: "s3", name: "Chicken shawarama", price: 120, img: "starter3.jpg"},
+            {id: "s3", name: "Chicken shawarma", price: 120, img: "starter3.jpg"},
             {id: "s4", name: "Kibbeh", price: 290, img: "starter4.jpg"},
         ],
         "Mains": [
             { id: "m1", name: "Chicken Mandi", price: 480, img: "main1.jpg" },
             { id: "m2", name: "Lamb Kabsa", price: 650, img: "main2.jpeg" },
-            { id: "m3", name: "chicken Kabsa", price: 420, img: "main3.jpg" },
-            { id: "m4", name: "Mixed Grill/Platter", price: 590, img: "main4.jpg" },
+            { id: "m3", name: "Chicken Kabsa", price: 420, img: "main3.jpg" },
+            { id: "m4", name: "Mixed Grill Platter", price: 590, img: "main4.jpg" },
             { id: "m5", name: "Machboos", price: 720, img: "main5.jpg" },
         ],
         "Desserts": [
@@ -522,7 +632,7 @@
             { id: "b2", name: "Laban", price: 120, img: "drink2.png" },
             { id: "b3", name: "Rose Milk", price: 160, img: "drink3.jpg" },
             { id: "b4", name: "Tamarind Juice", price: 140, img: "drink4.jpg" },
-            { id: "b5", name: "Karak tea", price: 140, img: "drink5.jpg" }
+            { id: "b5", name: "Karak Tea", price: 140, img: "drink5.jpg" }
         ]
     };
 
@@ -592,7 +702,7 @@
             const qty = cart[item.id] || 0;
             grid.innerHTML += `
                 <div class="card">
-                    <img src="${item.img}" alt="${item.name}">
+                    <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/300x180?text=Arabian+Nights'">
                     <div class="card-body">
                         <h3 style="margin:0">${item.name}</h3>
                         <p style="color:var(--gold); font-weight:700">₹${item.price}</p>
@@ -993,6 +1103,16 @@
             trackingInterval = null;
         }
     }
+
+    // Add error handling for images
+    window.addEventListener('load', function() {
+        const images = document.querySelectorAll('img');
+        images.forEach(img => {
+            img.onerror = function() {
+                this.src = 'https://via.placeholder.com/300x180?text=Arabian+Nights';
+            };
+        });
+    });
 </script>
 </body>
 </html>
