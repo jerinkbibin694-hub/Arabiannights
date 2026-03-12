@@ -1,0 +1,1055 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - Arabian Nights</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f8fafc;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #0f172a, #1e293b);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #b45309;
+        }
+
+        .header h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+        }
+
+        .header h1 span {
+            color: #b45309;
+            font-size: 1rem;
+            margin-left: 10px;
+        }
+
+        .admin-info {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .logout-btn {
+            background: #b45309;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: #92400e;
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard Layout */
+        .dashboard {
+            display: flex;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: white;
+            border-right: 1px solid #e2e8f0;
+            padding: 30px 0;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+        }
+
+        .sidebar-item {
+            padding: 15px 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #64748b;
+            font-weight: 500;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-item:hover {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .sidebar-item.active {
+            background: #fef3c7;
+            color: #b45309;
+            border-left-color: #b45309;
+            font-weight: 600;
+        }
+
+        .sidebar-item i {
+            font-size: 1.2rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 30px;
+            background: #f8fafc;
+            overflow-y: auto;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active-page {
+            display: block;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+
+        .stat-title {
+            color: #64748b;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #b45309;
+            margin-top: 10px;
+        }
+
+        .stat-sub {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-top: 5px;
+        }
+
+        /* Tables */
+        .section-title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 30px 0 20px;
+        }
+
+        .section-title h2 {
+            font-family: 'Playfair Display', serif;
+            color: #0f172a;
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar select, .filter-bar input {
+            padding: 10px 15px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            min-width: 200px;
+        }
+
+        .filter-bar select:focus, .filter-bar input:focus {
+            outline: none;
+            border-color: #b45309;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background: #f8fafc;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        tr:hover {
+            background: #fef3c7;
+        }
+
+        .status-badge {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .status-pending {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .status-preparing {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .status-ready {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .status-completed {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .action-btn {
+            background: #b45309;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            margin: 0 5px;
+        }
+
+        .action-btn:hover {
+            background: #92400e;
+        }
+
+        .delete-btn {
+            background: #dc2626;
+        }
+
+        .delete-btn:hover {
+            background: #b91c1c;
+        }
+
+        /* Order Items Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #64748b;
+        }
+
+        .item-list {
+            list-style: none;
+        }
+
+        .item-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        /* Summary Cards */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .summary-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .summary-card h3 {
+            color: #0f172a;
+            margin-bottom: 15px;
+            font-size: 1.1rem;
+        }
+
+        .revenue-total {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #b45309;
+        }
+
+        .refresh-btn {
+            background: #0f172a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .refresh-btn:hover {
+            background: #1e293b;
+        }
+
+        .empty-message {
+            text-align: center;
+            padding: 40px;
+            color: #94a3b8;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Arabian Nights <span>Admin Dashboard</span></h1>
+        <div class="admin-info">
+            <span>👤 Admin</span>
+            <button class="logout-btn" onclick="logout()">Logout</button>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <ul class="sidebar-menu">
+                <li class="sidebar-item active" onclick="switchPage('overview')">
+                    <span>📊</span> Overview
+                </li>
+                <li class="sidebar-item" onclick="switchPage('orders')">
+                    <span>📦</span> Orders Management
+                </li>
+                <li class="sidebar-item" onclick="switchPage('bookings')">
+                    <span>📅</span> Table Bookings
+                </li>
+                <li class="sidebar-item" onclick="switchPage('reports')">
+                    <span>📈</span> Reports & Analytics
+                </li>
+            </ul>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Overview Page -->
+            <div id="overview-page" class="page active-page">
+                <div class="stats-grid" id="statsContainer">
+                    <div class="stat-card">
+                        <div class="stat-title">Today's Orders</div>
+                        <div class="stat-number" id="todayOrders">0</div>
+                        <div class="stat-sub">Last 24 hours</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Today's Bookings</div>
+                        <div class="stat-number" id="todayBookings">0</div>
+                        <div class="stat-sub">Table reservations</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Revenue Today</div>
+                        <div class="stat-number" id="todayRevenue">₹0</div>
+                        <div class="stat-sub">From completed orders</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Pending Orders</div>
+                        <div class="stat-number" id="pendingOrders">0</div>
+                        <div class="stat-sub">Awaiting preparation</div>
+                    </div>
+                </div>
+
+                <div class="section-title">
+                    <h2>Recent Orders</h2>
+                    <button class="refresh-btn" onclick="loadDashboardData()">🔄 Refresh</button>
+                </div>
+                <div class="table-container">
+                    <table id="recentOrdersTable">
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Table</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrdersBody">
+                            <tr><td colspan="8" class="empty-message">Loading orders...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="section-title">
+                    <h2>Today's Bookings</h2>
+                </div>
+                <div class="table-container">
+                    <table id="todayBookingsTable">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Time</th>
+                                <th>Guests</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="todayBookingsBody">
+                            <tr><td colspan="5" class="empty-message">Loading bookings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Orders Management Page -->
+            <div id="orders-page" class="page">
+                <div class="section-title">
+                    <h2>All Orders</h2>
+                    <div class="filter-bar">
+                        <select id="orderStatusFilter" onchange="loadAllOrders()">
+                            <option value="all">All Status</option>
+                            <option value="Pending">Pending</option>
+                            <option value="Preparing">Preparing</option>
+                            <option value="Ready">Ready</option>
+                            <option value="Completed">Completed</option>
+                        </select>
+                        <input type="date" id="orderDateFilter" onchange="loadAllOrders()">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Order #</th>
+                                <th>Customer</th>
+                                <th>Table</th>
+                                <th>Items</th>
+                                <th>Total</th>
+                                <th>Payment</th>
+                                <th>Status</th>
+                                <th>Time</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allOrdersBody">
+                            <tr><td colspan="9" class="empty-message">Loading orders...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Bookings Management Page -->
+            <div id="bookings-page" class="page">
+                <div class="section-title">
+                    <h2>Table Bookings</h2>
+                    <div class="filter-bar">
+                        <input type="date" id="bookingDateFilter" onchange="loadAllBookings()">
+                    </div>
+                </div>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Mobile</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Guests</th>
+                                <th>Booked On</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="allBookingsBody">
+                            <tr><td colspan="7" class="empty-message">Loading bookings...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Reports Page -->
+            <div id="reports-page" class="page">
+                <div class="section-title">
+                    <h2>Reports & Analytics</h2>
+                    <div class="filter-bar">
+                        <select id="reportPeriod" onchange="generateReport()">
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                            <option value="all">All Time</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">Total Orders</div>
+                        <div class="stat-number" id="reportTotalOrders">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Total Revenue</div>
+                        <div class="stat-number" id="reportTotalRevenue">₹0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Avg Order Value</div>
+                        <div class="stat-number" id="reportAvgOrder">₹0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">Total Bookings</div>
+                        <div class="stat-number" id="reportTotalBookings">0</div>
+                    </div>
+                </div>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <h3>Payment Methods</h3>
+                        <div id="paymentStats"></div>
+                    </div>
+                    <div class="summary-card">
+                        <h3>Popular Items</h3>
+                        <div id="popularItems"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Details Modal -->
+    <div class="modal" id="orderModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Order Details</h2>
+                <button class="close-modal" onclick="closeModal()">✕</button>
+            </div>
+            <div id="orderDetails"></div>
+        </div>
+    </div>
+
+    <script>
+        // Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
+            authDomain: "arabian-nights-cca24.firebaseapp.com",
+            databaseURL: "https://arabian-nights-cca24-default-rtdb.firebaseio.com",
+            projectId: "arabian-nights-cca24",
+            storageBucket: "arabian-nights-cca24.firebasestorage.app",
+            messagingSenderId: "405951495752",
+            appId: "1:405951495752:web:cedcf446717f9359b2e27d",
+            measurementId: "G-N6ZC0F2J5V"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Check authentication
+        if (sessionStorage.getItem('adminLoggedIn') !== 'true') {
+            window.location.href = 'admin-login.html';
+        }
+
+        // Load data on page load
+        window.onload = function() {
+            loadDashboardData();
+        };
+
+        // Switch between pages
+        function switchPage(page) {
+            // Update sidebar active state
+            document.querySelectorAll('.sidebar-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            event.currentTarget.classList.add('active');
+
+            // Show selected page
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active-page');
+            });
+            document.getElementById(page + '-page').classList.add('active-page');
+
+            // Load page-specific data
+            if (page === 'orders') {
+                loadAllOrders();
+            } else if (page === 'bookings') {
+                loadAllBookings();
+            } else if (page === 'reports') {
+                generateReport();
+            }
+        }
+
+        // Load dashboard overview data
+        function loadDashboardData() {
+            const today = new Date().toISOString().split('T')[0];
+            
+            // Get orders
+            database.ref('orders').once('value', (snapshot) => {
+                const orders = snapshot.val();
+                if (!orders) {
+                    document.getElementById('recentOrdersBody').innerHTML = '<tr><td colspan="8" class="empty-message">No orders found</td></tr>';
+                    return;
+                }
+
+                const ordersArray = Object.values(orders);
+                
+                // Calculate stats
+                const todayOrders = ordersArray.filter(o => o.timestamp && o.timestamp.split('T')[0] === today);
+                const pendingOrders = ordersArray.filter(o => o.status === 'Pending' || o.status === 'Preparing');
+                const todayRevenue = todayOrders
+                    .filter(o => o.status === 'Completed' || o.paymentStatus === 'Paid')
+                    .reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+
+                document.getElementById('todayOrders').textContent = todayOrders.length;
+                document.getElementById('pendingOrders').textContent = pendingOrders.length;
+                document.getElementById('todayRevenue').textContent = '₹' + todayRevenue;
+
+                // Recent orders (last 5)
+                const recentOrders = ordersArray
+                    .sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''))
+                    .slice(0, 5);
+
+                let recentHtml = '';
+                recentOrders.forEach(order => {
+                    const itemsCount = order.items ? order.items.length : 0;
+                    const statusClass = getStatusClass(order.status);
+                    
+                    recentHtml += `
+                        <tr>
+                            <td>#${order.orderNumber || order.id}</td>
+                            <td>${order.name || 'N/A'}</td>
+                            <td>${order.table || 'Takeaway'}</td>
+                            <td>${itemsCount} items</td>
+                            <td>${order.total || '₹0'}</td>
+                            <td><span class="status-badge ${statusClass}">${order.status || 'Pending'}</span></td>
+                            <td>${formatTime(order.timestamp)}</td>
+                            <td>
+                                <button class="action-btn" onclick="viewOrderDetails('${order.id}')">View</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('recentOrdersBody').innerHTML = recentHtml || '<tr><td colspan="8" class="empty-message">No recent orders</td></tr>';
+            });
+
+            // Get bookings
+            database.ref('bookings').once('value', (snapshot) => {
+                const bookings = snapshot.val();
+                if (!bookings) {
+                    document.getElementById('todayBookingsBody').innerHTML = '<tr><td colspan="5" class="empty-message">No bookings found</td></tr>';
+                    return;
+                }
+
+                const bookingsArray = Object.values(bookings);
+                const todayBookings = bookingsArray.filter(b => b.date === today);
+                document.getElementById('todayBookings').textContent = todayBookings.length;
+
+                let bookingsHtml = '';
+                todayBookings.slice(0, 5).forEach(booking => {
+                    bookingsHtml += `
+                        <tr>
+                            <td>${booking.name}</td>
+                            <td>${booking.mobile}</td>
+                            <td>${booking.time}</td>
+                            <td>${booking.guests}</td>
+                            <td><span class="status-badge status-pending">Confirmed</span></td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('todayBookingsBody').innerHTML = bookingsHtml || '<tr><td colspan="5" class="empty-message">No bookings today</td></tr>';
+            });
+        }
+
+        // Load all orders with filters
+        function loadAllOrders() {
+            const statusFilter = document.getElementById('orderStatusFilter').value;
+            const dateFilter = document.getElementById('orderDateFilter').value;
+
+            database.ref('orders').once('value', (snapshot) => {
+                const orders = snapshot.val();
+                if (!orders) {
+                    document.getElementById('allOrdersBody').innerHTML = '<tr><td colspan="9" class="empty-message">No orders found</td></tr>';
+                    return;
+                }
+
+                let ordersArray = Object.entries(orders).map(([id, order]) => ({ ...order, id }));
+
+                // Apply filters
+                if (statusFilter !== 'all') {
+                    ordersArray = ordersArray.filter(o => o.status === statusFilter);
+                }
+                if (dateFilter) {
+                    ordersArray = ordersArray.filter(o => o.timestamp && o.timestamp.split('T')[0] === dateFilter);
+                }
+
+                // Sort by timestamp (newest first)
+                ordersArray.sort((a, b) => (b.timestamp || '').localeCompare(a.timestamp || ''));
+
+                let html = '';
+                ordersArray.forEach(order => {
+                    const itemsCount = order.items ? order.items.length : 0;
+                    const statusClass = getStatusClass(order.status);
+                    const paymentMethod = order.paymentMethod || 'Cash';
+                    
+                    html += `
+                        <tr>
+                            <td>#${order.orderNumber || order.id}</td>
+                            <td>${order.name || 'N/A'}</td>
+                            <td>${order.table || 'Takeaway'}</td>
+                            <td>${itemsCount} items</td>
+                            <td>${order.total || '₹0'}</td>
+                            <td>${paymentMethod}</td>
+                            <td><span class="status-badge ${statusClass}">${order.status || 'Pending'}</span></td>
+                            <td>${formatDateTime(order.timestamp)}</td>
+                            <td>
+                                <button class="action-btn" onclick="viewOrderDetails('${order.id}')">View</button>
+                                <button class="action-btn delete-btn" onclick="deleteOrder('${order.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('allOrdersBody').innerHTML = html || '<tr><td colspan="9" class="empty-message">No orders found</td></tr>';
+            });
+        }
+
+        // Load all bookings
+        function loadAllBookings() {
+            const dateFilter = document.getElementById('bookingDateFilter').value;
+
+            database.ref('bookings').once('value', (snapshot) => {
+                const bookings = snapshot.val();
+                if (!bookings) {
+                    document.getElementById('allBookingsBody').innerHTML = '<tr><td colspan="7" class="empty-message">No bookings found</td></tr>';
+                    return;
+                }
+
+                let bookingsArray = Object.entries(bookings).map(([id, booking]) => ({ ...booking, id }));
+
+                // Apply date filter
+                if (dateFilter) {
+                    bookingsArray = bookingsArray.filter(b => b.date === dateFilter);
+                }
+
+                // Sort by date/time (most recent first)
+                bookingsArray.sort((a, b) => {
+                    if (a.date !== b.date) return b.date.localeCompare(a.date);
+                    return b.time.localeCompare(a.time);
+                });
+
+                let html = '';
+                bookingsArray.forEach(booking => {
+                    html += `
+                        <tr>
+                            <td>${booking.name}</td>
+                            <td>${booking.mobile}</td>
+                            <td>${formatDate(booking.date)}</td>
+                            <td>${booking.time}</td>
+                            <td>${booking.guests}</td>
+                            <td>${formatDateTime(booking.timestamp)}</td>
+                            <td>
+                                <button class="action-btn delete-btn" onclick="deleteBooking('${booking.id}')">Delete</button>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('allBookingsBody').innerHTML = html || '<tr><td colspan="7" class="empty-message">No bookings found</td></tr>';
+            });
+        }
+
+        // Generate report
+        function generateReport() {
+            const period = document.getElementById('reportPeriod').value;
+
+            database.ref('orders').once('value', (ordersSnapshot) => {
+                database.ref('bookings').once('value', (bookingsSnapshot) => {
+                    const orders = ordersSnapshot.val();
+                    const bookings = bookingsSnapshot.val();
+
+                    if (!orders) {
+                        updateReportStats([], []);
+                        return;
+                    }
+
+                    let ordersArray = Object.values(orders);
+                    let bookingsArray = bookings ? Object.values(bookings) : [];
+
+                    // Filter by period
+                    const now = new Date();
+                    const today = now.toISOString().split('T')[0];
+                    
+                    if (period === 'today') {
+                        ordersArray = ordersArray.filter(o => o.timestamp && o.timestamp.split('T')[0] === today);
+                        bookingsArray = bookingsArray.filter(b => b.date === today);
+                    } else if (period === 'week') {
+                        const weekAgo = new Date(now.setDate(now.getDate() - 7)).toISOString().split('T')[0];
+                        ordersArray = ordersArray.filter(o => o.timestamp && o.timestamp.split('T')[0] >= weekAgo);
+                        bookingsArray = bookingsArray.filter(b => b.date >= weekAgo);
+                    } else if (period === 'month') {
+                        const monthAgo = new Date(now.setMonth(now.getMonth() - 1)).toISOString().split('T')[0];
+                        ordersArray = ordersArray.filter(o => o.timestamp && o.timestamp.split('T')[0] >= monthAgo);
+                        bookingsArray = bookingsArray.filter(b => b.date >= monthAgo);
+                    }
+
+                    updateReportStats(ordersArray, bookingsArray);
+                });
+            });
+        }
+
+        // Update report statistics
+        function updateReportStats(orders, bookings) {
+            const totalOrders = orders.length;
+            const totalRevenue = orders.reduce((sum, o) => sum + (o.totalAmount || 0), 0);
+            const avgOrder = totalOrders > 0 ? Math.round(totalRevenue / totalOrders) : 0;
+            const totalBookings = bookings.length;
+
+            document.getElementById('reportTotalOrders').textContent = totalOrders;
+            document.getElementById('reportTotalRevenue').textContent = '₹' + totalRevenue;
+            document.getElementById('reportAvgOrder').textContent = '₹' + avgOrder;
+            document.getElementById('reportTotalBookings').textContent = totalBookings;
+
+            // Payment method stats
+            const paymentStats = {};
+            orders.forEach(o => {
+                const method = o.paymentMethod || 'Cash';
+                paymentStats[method] = (paymentStats[method] || 0) + 1;
+            });
+
+            let paymentHtml = '';
+            Object.entries(paymentStats).forEach(([method, count]) => {
+                const percentage = totalOrders > 0 ? Math.round((count / totalOrders) * 100) : 0;
+                paymentHtml += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>${method}</span>
+                        <span><strong>${count}</strong> (${percentage}%)</span>
+                    </div>
+                `;
+            });
+            document.getElementById('paymentStats').innerHTML = paymentHtml || '<p>No payment data</p>';
+
+            // Popular items
+            const itemCounts = {};
+            orders.forEach(order => {
+                if (order.items) {
+                    order.items.forEach(item => {
+                        const key = item.name || item.id;
+                        itemCounts[key] = (itemCounts[key] || 0) + (item.quantity || 1);
+                    });
+                }
+            });
+
+            const popularItems = Object.entries(itemCounts)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+
+            let itemsHtml = '';
+            popularItems.forEach(([name, count]) => {
+                itemsHtml += `
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <span>${name}</span>
+                        <span><strong>${count}</strong> orders</span>
+                    </div>
+                `;
+            });
+            document.getElementById('popularItems').innerHTML = itemsHtml || '<p>No item data</p>';
+        }
+
+        // View order details
+        function viewOrderDetails(orderId) {
+            database.ref('orders/' + orderId).once('value', (snapshot) => {
+                const order = snapshot.val();
+                if (!order) return;
+
+                let itemsHtml = '<h3>Order Items</h3><ul class="item-list">';
+                if (order.items) {
+                    order.items.forEach(item => {
+                        itemsHtml += `
+                            <li>
+                                <span>${item.name} x${item.quantity}</span>
+                                <span>₹${item.price * item.quantity}</span>
+                            </li>
+                        `;
+                    });
+                }
+                itemsHtml += '</ul>';
+
+                document.getElementById('orderDetails').innerHTML = `
+                    <p><strong>Order #:</strong> ${order.orderNumber || orderId}</p>
+                    <p><strong>Customer:</strong> ${order.name || 'N/A'}</p>
+                    <p><strong>Table:</strong> ${order.table || 'Takeaway'}</p>
+                    <p><strong>Total:</strong> ${order.total || '₹0'}</p>
+                    <p><strong>Payment:</strong> ${order.paymentMethod || 'Cash'}</p>
+                    <p><strong>Status:</strong> ${order.status || 'Pending'}</p>
+                    <p><strong>Time:</strong> ${formatDateTime(order.timestamp)}</p>
+                    ${itemsHtml}
+                `;
+
+                document.getElementById('orderModal').classList.add('active');
+            });
+        }
+
+        // Delete order
+        function deleteOrder(orderId) {
+            if (confirm('Are you sure you want to delete this order? This action cannot be undone.')) {
+                database.ref('orders/' + orderId).remove()
+                    .then(() => {
+                        alert('Order deleted successfully');
+                        loadAllOrders();
+                        loadDashboardData();
+                    })
+                    .catch(error => {
+                        alert('Error deleting order: ' + error.message);
+                    });
+            }
+        }
+
+        // Delete booking
+        function deleteBooking(bookingId) {
+            if (confirm('Are you sure you want to delete this booking?')) {
+                database.ref('bookings/' + bookingId).remove()
+                    .then(() => {
+                        alert('Booking deleted successfully');
+                        loadAllBookings();
+                        loadDashboardData();
+                    })
+                    .catch(error => {
+                        alert('Error deleting booking: ' + error.message);
+                    });
+            }
+        }
+
+        // Close modal
+        function closeModal() {
+            document.getElementById('orderModal').classList.remove('active');
+        }
+
+        // Helper functions
+        function getStatusClass(status) {
+            switch(status) {
+                case 'Pending': return 'status-pending';
+                case 'Preparing': return 'status-preparing';
+                case 'Ready': return 'status-ready';
+                case 'Completed': return 'status-completed';
+                default: return 'status-pending';
+            }
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+        }
+
+        function formatTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' });
+        }
+
+        function formatDateTime(timestamp) {
+            if (!timestamp) return 'N/A';
+            const date = new Date(timestamp);
+            return date.toLocaleString('en-IN', { 
+                day: '2-digit', 
+                month: 'short', 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+
+        // Logout function
+        function logout() {
+            sessionStorage.removeItem('adminLoggedIn');
+            sessionStorage.removeItem('userRole');
+            window.location.href = 'admin-login.html';
+        }
+
+        // Auto-refresh dashboard every 30 seconds
+        setInterval(() => {
+            if (document.getElementById('overview-page').classList.contains('active-page')) {
+                loadDashboardData();
+            }
+        }, 30000);
+    </script>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gourmet Reserve | Table Booking</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+
+    <style>
+        :root {
+            --primary-gold: #c5a059;
+            --glass-bg: rgba(15, 15, 15, 0.9);
+            --border-white: rgba(255, 255, 255, 0.15);
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: #000 url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+            color: #fff;
+        }
+
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), rgba(0,0,0,0.5));
+            z-index: -1;
+        }
+
+        .card {
+            padding: 40px;
+            border-radius: 20px;
+            backdrop-filter: blur(12px);
+            background: var(--glass-bg);
+            border: 1px solid var(--border-white);
+            box-shadow: 0 30px 60px rgba(0,0,0,0.6);
+            width: 100%;
+            max-width: 420px;
+            animation: slideIn 0.8s ease-out;
+            text-align: center;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            color: var(--primary-gold);
+            text-transform: capitalize;
+        }
+
+        .input-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.07);
+            border: 1px solid var(--border-white);
+            border-radius: 10px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            box-sizing: border-box;
+            transition: 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            background: rgba(255, 255, 255, 0.12);
+        }
+
+        /* Time input specific styling for AM/PM browsers */
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8) sepia(50%) saturate(1000%) hue-rotate(10deg);
+            cursor: pointer;
+        }
+
+        button.main-btn {
+            width: 100%;
+            padding: 16px;
+            margin-top: 15px;
+            background: var(--primary-gold);
+            color: #111;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        button.main-btn:hover {
+            background: #d4af37;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(197, 160, 89, 0.4);
+        }
+
+        .booking-details {
+            text-align: left;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 25px 0;
+            border-left: 4px solid var(--primary-gold);
+        }
+
+        .booking-details p { margin: 8px 0; font-size: 0.95rem; }
+        .booking-details span { color: var(--primary-gold); font-weight: 600; }
+
+        .about-btn {
+            position: absolute;
+            top: 25px;
+            right: 30px;
+            padding: 10px 25px;
+            border: 1px solid var(--primary-gold);
+            color: var(--primary-gold);
+            text-decoration: none;
+            border-radius: 50px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+
+        .about-btn:hover { background: var(--primary-gold); color: #000; }
+        #msg { color: #ff6b6b; font-size: 0.85rem; margin-top: 15px; min-height: 1.5em; }
+        .success { display: none; }
+    </style>
+</head>
+
+<body>
+    <div class="overlay"></div>
+    <a href="about.html" class="about-btn">About Us</a>
+
+    <div class="card" id="bookingForm">
+        <h2>Book A Table</h2>
+        
+        <input type="text" id="name" placeholder="Full Name" style="margin-bottom: 15px;">
+        <input type="tel" id="mobile" placeholder="10-Digit Mobile Number" maxlength="10" style="margin-bottom: 15px;">
+        
+        <div class="input-row">
+            <input type="date" id="date" required>
+            <input type="time" id="time" required>
+        </div>
+        
+        <input type="number" id="guests" placeholder="Guests (1-20)" min="1" max="20">
+
+        <button class="main-btn" onclick="book()">Confirm Reservation</button>
+        <p id="msg"></p>
+    </div>
+
+    <div class="card success" id="successPage">
+        <div style="font-size: 4rem; color: #4BB543; margin-bottom: 10px;">✓</div>
+        <h2 style="color: white; margin-bottom: 10px;">Confirmed!</h2>
+        <p style="color: #bbb; font-size: 0.9rem;">Your table is waiting for you.</p>
+        
+        <div class="booking-details">
+            <p>Name: <span id="sname"></span></p>
+            <p>Mobile: <span id="smobile"></span></p>
+            <p>Date: <span id="sdate"></span></p>
+            <p>Time: <span id="stime"></span></p>
+            <p>Guests: <span id="sguests"></span> People</p>
+        </div>
+
+        <button class="main-btn" onclick="goBack()" style="background: transparent; border: 1px solid #444; color: #fff;">Book Another</button>
+    </div>
+
+    <script>
+        // Initialize Firebase (Keep your existing credentials)
+        const firebaseConfig = {
+            apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
+            authDomain: "arabian-nights-cca24.firebaseapp.com",
+            databaseURL: "https://arabian-nights-cca24-default-rtdb.firebaseio.com",
+            projectId: "arabian-nights-cca24",
+            storageBucket: "arabian-nights-cca24.firebasestorage.app",
+            messagingSenderId: "405951495752",
+            appId: "1:405951495752:web:cedcf446717f9359b2e27d",
+            measurementId: "G-N6ZC0F2J5V"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
+
+        // Prevent past dates
+        document.getElementById("date").setAttribute("min", new Date().toISOString().split("T")[0]);
+
+        // Helper function to format 24hr time to 12hr AM/PM
+        function formatTime(timeString) {
+            const [hour, minute] = timeString.split(':');
+            const h = parseInt(hour);
+            const ampm = h >= 12 ? 'PM' : 'AM';
+            const displayHour = h % 12 || 12;
+            return `${displayHour}:${minute} ${ampm}`;
+        }
+
+        function book() {
+            const name = document.getElementById("name").value;
+            const mobile = document.getElementById("mobile").value;
+            const date = document.getElementById("date").value;
+            const timeRaw = document.getElementById("time").value;
+            const guests = document.getElementById("guests").value;
+            const msg = document.getElementById("msg");
+
+            if(!name || !mobile || !date || !timeRaw || !guests) {
+                msg.innerText = "Error: Please fill in all fields.";
+                return;
+            }
+
+            if(mobile.length !== 10) {
+                msg.innerText = "Error: Mobile must be 10 digits.";
+                return;
+            }
+
+            const timeFormatted = formatTime(timeRaw);
+
+            database.ref('bookings').push({
+                name, mobile, date, time: timeFormatted, guests,
+                timestamp: new Date().toISOString()
+            }).then(() => {
+                document.getElementById("bookingForm").style.display="none";
+                document.getElementById("successPage").style.display="block";
+
+                document.getElementById("sname").innerText = name;
+                document.getElementById("smobile").innerText = mobile;
+                document.getElementById("sdate").innerText = date;
+                document.getElementById("stime").innerText = timeFormatted;
+                document.getElementById("sguests").innerText = guests;
+            }).catch(e => {
+                msg.innerText = "Booking failed. Try again.";
+            });
+        }
+
+        function goBack() {
+            document.getElementById("successPage").style.display="none";
+            document.getElementById("bookingForm").style.display="block";
+            ["name", "mobile", "date", "time", "guests"].forEach(id => document.getElementById(id).value = "");
+            document.getElementById("msg").innerText = "";
+        }
+    </script>
+</body>
+</html>
