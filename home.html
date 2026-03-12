@@ -3,19 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARABIAN NIGHTS | The Sultan's Grand Feast</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
-    <!-- Firebase SDKs -->
+    <title>ARABIAN NIGHTS | Sultan's Grand Feast + Combos</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&family=Playfair+Display:wght@700;900&display=swap" rel="stylesheet">
+    
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
     
-    <!-- Easy PayIO Gateway SDK Integration -->
     <script src="easypayio-gateway.js"></script>
     
     <style>
         :root {
             --primary: #0f172a;
             --gold: #b45309;
+            --gold-light: #fbbf24;
             --cream: #fffbeb;
             --glass: rgba(255, 255, 255, 0.98);
             --dark: #020617;
@@ -23,6 +23,10 @@
             --error: #dc2626;
             --info: #3b82f6;
             --warning: #d97706;
+        }
+
+        * {
+            box-sizing: border-box;
         }
 
         body {
@@ -50,7 +54,6 @@
             text-transform: uppercase; 
         }
 
-        /* Portal Links */
         .portal-links {
             position: absolute;
             top: 20px;
@@ -103,7 +106,6 @@
             position: relative;
         }
 
-        /* Page Header with Close Button */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -140,24 +142,149 @@
             transform: scale(1.1);
         }
 
-        /* Input Styles */
-        input { width: 100%; padding: 15px; margin: 12px 0; border-radius: 12px; border: 2px solid #e2e8f0; box-sizing: border-box; }
-        .btn { background: var(--primary); color: white; border: none; padding: 14px 24px; border-radius: 12px; cursor: pointer; font-weight: 600; width: 100%; transition: 0.3s; }
-        .btn:hover { background: var(--gold); }
-        .btn:disabled { background: #94a3b8; cursor: not-allowed; }
+        input { 
+            width: 100%; 
+            padding: 15px; 
+            margin: 12px 0; 
+            border-radius: 12px; 
+            border: 2px solid #e2e8f0; 
+            box-sizing: border-box; 
+            transition: all 0.3s; 
+        }
+        
+        input:focus { 
+            outline: none; 
+            border-color: var(--gold); 
+            box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.1); 
+        }
+        
+        .btn { 
+            background: var(--primary); 
+            color: white; 
+            border: none; 
+            padding: 14px 24px; 
+            border-radius: 12px; 
+            cursor: pointer; 
+            font-weight: 600; 
+            width: 100%; 
+            transition: 0.3s; 
+        }
+        
+        .btn:hover { 
+            background: var(--gold); 
+        }
+        
+        .btn:disabled { 
+            background: #94a3b8; 
+            cursor: not-allowed; 
+        }
 
-        /* Menu Grid */
-        .controls { background: var(--dark); padding: 25px; position: sticky; top: 0; z-index: 100; border-bottom: 3px solid var(--gold); }
-        .category-bar { display: flex; overflow-x: auto; gap: 12px; padding-bottom: 10px; scrollbar-width: none; }
-        .cat-item { color: #94a3b8; padding: 8px 20px; cursor: pointer; border-radius: 30px; white-space: nowrap; border: 1px solid #1e293b; }
-        .cat-item.active { background: var(--gold); color: white; border-color: var(--gold); }
+        .controls { 
+            background: var(--dark); 
+            padding: 25px; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100; 
+            border-bottom: 3px solid var(--gold); 
+        }
+        
+        .category-bar { 
+            display: flex; 
+            overflow-x: auto; 
+            gap: 12px; 
+            padding-bottom: 10px; 
+            scrollbar-width: none; 
+        }
+        
+        .cat-item { 
+            color: #94a3b8; 
+            padding: 8px 20px; 
+            cursor: pointer; 
+            border-radius: 30px; 
+            white-space: nowrap; 
+            border: 1px solid #1e293b;
+            transition: all 0.2s ease;
+            font-weight: 500;
+        }
+        
+        .cat-item.active { 
+            background: var(--gold); 
+            color: white; 
+            border-color: var(--gold); 
+        }
 
-        .menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 25px; padding: 30px; }
-        .card { background: white; border-radius: 20px; overflow: hidden; border: 1px solid #f1f5f9; transition: 0.3s; }
-        .card img { width: 100%; height: 180px; object-fit: cover; }
-        .card-body { padding: 20px; }
-       
-        /* THE ADD/REMOVE BUTTON SYSTEM */
+        .cat-item.combo-glow {
+            background: linear-gradient(145deg, #f97316, #dc2626);
+            color: white;
+            border: none;
+            box-shadow: 0 0 0 2px rgba(255,215,0,0.5), 0 0 20px #fbbf24, 0 4px 15px rgba(220,38,38,0.6);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 28px;
+            position: relative;
+            animation: pulseCombo 1.8s infinite;
+            border: 1px solid gold;
+        }
+        
+        @keyframes pulseCombo {
+            0% { box-shadow: 0 0 0 2px rgba(255,215,0,0.5), 0 0 15px #f59e0b, 0 4px 15px #dc2626; }
+            50% { box-shadow: 0 0 0 4px rgba(255,215,0,0.8), 0 0 30px #fbbf24, 0 4px 25px #b91c1c; transform: scale(1.02); }
+            100% { box-shadow: 0 0 0 2px rgba(255,215,0,0.5), 0 0 15px #f59e0b, 0 4px 15px #dc2626; }
+        }
+
+        .menu-grid { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); 
+            gap: 25px; 
+            padding: 30px; 
+        }
+        
+        .card { 
+            background: white; 
+            border-radius: 20px; 
+            overflow: hidden; 
+            border: 1px solid #f1f5f9; 
+            transition: 0.3s;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            min-height: 380px;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        }
+        
+        .card img { 
+            width: 100%; 
+            height: 200px; 
+            object-fit: cover; 
+            background-color: #f8fafc;
+        }
+        
+        .card-body { 
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .card-body h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1rem;
+            line-height: 1.4;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+        }
+        
+        .card-body p {
+            margin: 0 0 15px 0;
+            font-weight: 700;
+        }
+        
         .qty-control {
             display: flex;
             align-items: center;
@@ -167,7 +294,9 @@
             border: 1px solid #e2e8f0;
             overflow: hidden;
             height: 45px;
+            margin-top: auto;
         }
+        
         .qty-btn {
             background: var(--primary);
             color: white;
@@ -179,8 +308,17 @@
             font-weight: bold;
             transition: 0.2s;
         }
-        .qty-btn:hover { background: var(--gold); }
-        .qty-num { font-weight: 700; color: var(--primary); font-size: 1.1rem; }
+        
+        .qty-btn:hover { 
+            background: var(--gold); 
+        }
+        
+        .qty-num { 
+            font-weight: 700; 
+            color: var(--primary); 
+            font-size: 1.1rem; 
+        }
+        
         .add-initial {
             background: var(--primary);
             color: white;
@@ -191,15 +329,32 @@
             font-weight: 600;
             width: 100%;
             height: 45px;
+            margin-top: auto;
         }
 
-        /* Pages */
-        .page { display: none; padding: 40px; }
-        .active-page { display: block; }
+        .page { 
+            display: none; 
+            padding: 40px; 
+        }
+        
+        .active-page { 
+            display: block; 
+        }
        
-        .cart-trigger { position: fixed; bottom: 30px; right: 30px; background: var(--gold); color: white; padding: 15px 30px; border-radius: 50px; cursor: pointer; font-weight: bold; z-index: 1000; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .cart-trigger { 
+            position: fixed; 
+            bottom: 30px; 
+            right: 30px; 
+            background: var(--gold); 
+            color: white; 
+            padding: 15px 30px; 
+            border-radius: 50px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            z-index: 1000; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3); 
+        }
 
-        /* Payment UI */
         .pay-option { 
             display: flex; 
             align-items: center; 
@@ -210,31 +365,38 @@
             cursor: pointer;
             transition: all 0.3s;
         }
+        
         .pay-option:hover {
             transform: translateY(-2px);
             box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
+        
         .pay-option.selected { 
             border-color: var(--gold); 
             background: #fffcf0;
             border-width: 3px;
         }
+        
         .pay-icon {
             font-size: 2rem;
             margin-right: 15px;
         }
+        
         .pay-details {
             flex: 1;
         }
+        
         .pay-title {
             font-weight: 700;
             font-size: 1.2rem;
             margin-bottom: 5px;
         }
+        
         .pay-description {
             color: #64748b;
             font-size: 0.9rem;
         }
+        
         .cash-note {
             background: #fef3c7;
             border-left: 4px solid var(--gold);
@@ -245,14 +407,15 @@
             align-items: center;
             gap: 10px;
         }
+        
         .cash-note .icon {
             font-size: 1.5rem;
         }
+        
         .cash-note .text {
             font-weight: 500;
         }
 
-        /* Order Tracking */
         .tracking-card {
             background: white;
             border-radius: 20px;
@@ -260,6 +423,7 @@
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             margin-top: 20px;
         }
+        
         .order-header {
             display: flex;
             justify-content: space-between;
@@ -270,11 +434,13 @@
             flex-wrap: wrap;
             gap: 15px;
         }
+        
         .order-id {
             font-family: 'Playfair Display', serif;
             color: var(--gold);
             font-size: 1.2rem;
         }
+        
         .order-status {
             background: #fef3c7;
             color: var(--warning);
@@ -282,18 +448,22 @@
             border-radius: 30px;
             font-weight: 600;
         }
+        
         .order-status.preparing {
             background: #dbeafe;
             color: var(--info);
         }
+        
         .order-status.ready {
             background: #d1fae5;
             color: var(--success);
         }
+        
         .order-status.partial {
             background: #fff3cd;
             color: #856404;
         }
+        
         .timer-display {
             text-align: center;
             padding: 30px;
@@ -302,31 +472,37 @@
             color: white;
             margin: 20px 0;
         }
+        
         .timer {
             font-size: 4rem;
             font-weight: 700;
             font-family: monospace;
             color: var(--gold);
         }
+        
         .timer-label {
             font-size: 1rem;
             opacity: 0.8;
             margin-top: 10px;
         }
+        
         .order-items {
             margin: 20px 0;
         }
+        
         .order-item {
             display: flex;
             justify-content: space-between;
             padding: 10px;
             border-bottom: 1px dashed #e2e8f0;
         }
+        
         .order-item.ready {
             background: #f0fdf4;
             border-radius: 8px;
             color: var(--success);
         }
+        
         .progress-bar {
             width: 100%;
             height: 8px;
@@ -335,12 +511,14 @@
             margin: 20px 0;
             overflow: hidden;
         }
+        
         .progress-fill {
             height: 100%;
             background: var(--gold);
             width: 0%;
             transition: width 0.3s;
         }
+        
         .refresh-btn {
             background: var(--primary);
             color: white;
@@ -354,11 +532,11 @@
             gap: 5px;
             margin-top: 20px;
         }
+        
         .refresh-btn:hover {
             background: var(--gold);
         }
 
-        /* Enjoy Food Card */
         .enjoy-card {
             background: linear-gradient(135deg, #059669, #10b981);
             color: white;
@@ -371,15 +549,9 @@
         }
         
         @keyframes pulse {
-            0% {
-                transform: scale(1);
-            }
-            50% {
-                transform: scale(1.02);
-            }
-            100% {
-                transform: scale(1);
-            }
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
         }
         
         .enjoy-card h2 {
@@ -421,7 +593,6 @@
             margin-left: 5px;
         }
 
-        /* Table Booking Link */
         .booking-link {
             position: absolute;
             top: 20px;
@@ -445,7 +616,109 @@
             transform: translateY(-2px);
         }
 
-        /* Mobile Responsive */
+        .warning-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            z-index: 2000;
+            text-align: center;
+            max-width: 400px;
+            animation: slideIn 0.3s ease;
+        }
+
+        .warning-modal.error {
+            border-left: 6px solid var(--error);
+        }
+
+        .warning-modal.warning {
+            border-left: 6px solid var(--warning);
+        }
+
+        .warning-icon {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        .warning-title {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .warning-title.error {
+            color: var(--error);
+        }
+
+        .warning-title.warning {
+            color: var(--warning);
+        }
+
+        .warning-message {
+            color: #64748b;
+            margin-bottom: 25px;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        .warning-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+
+        .warning-button:hover {
+            background: var(--gold);
+            transform: translateY(-2px);
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            z-index: 1999;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .combo-badge {
+            background: #dc2626;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            margin-left: 8px;
+            white-space: nowrap;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translate(-50%, -60%);
+                opacity: 0;
+            }
+            to {
+                transform: translate(-50%, -50%);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
         @media (max-width: 768px) {
             header h1 {
                 font-size: 2rem;
@@ -465,6 +738,14 @@
                 margin-left: auto;
                 margin-right: auto;
             }
+            
+            .card {
+                min-height: 350px;
+            }
+            
+            .card img {
+                height: 160px;
+            }
         }
     </style>
 </head>
@@ -474,15 +755,13 @@
     <h1>ARABIAN NIGHTS</h1>
     <p>TRADITION IN EVERY BITE</p>
     
-    <!-- Booking Link -->
     <a href="tablebooking.html" class="booking-link">
         <span>📅</span> Book a Table
     </a>
     
-    <!-- Portal Links -->
     <div class="portal-links">
-        <a href="admin-login.html" class="portal-link admin">👑 Admin</a>
-        <a href="staff-login.html" class="portal-link staff">👨‍🍳 Staff</a>
+        <a href="admin-login.html" class="portal-link admin">Admin</a>
+        <a href="staff-login.html" class="portal-link staff">Staff</a>
     </div>
 </header>
 
@@ -495,14 +774,14 @@
             <button class="btn" style="margin-top: 20px;" onclick="handleLogin()">Enter Restaurant</button>
         </div>
         <p style="margin-top: 20px; color: #64748b;">
-            <small>👑 Admin? <a href="admin-login.html" style="color: var(--gold);">Click here</a> | 
-            👨‍🍳 Staff? <a href="staff-login.html" style="color: var(--success);">Click here</a></small>
+            <small>Admin? <a href="admin-login.html" style="color: var(--gold);">Click here</a> | 
+            Staff? <a href="staff-login.html" style="color: var(--success);">Click here</a></small>
         </p>
     </div>
 
     <div id="menu-page" class="page" style="padding:0">
         <div class="controls">
-            <input type="text" class="search-box" style="background:#1e293b; border:none; color:white; width:100%; padding:12px; border-radius:10px; margin-bottom:15px" id="search" placeholder="Search menu..." oninput="render()">
+            <input type="text" class="search-box" style="background:#1e293b; border:none; color:white; width:100%; padding:12px; border-radius:10px; margin-bottom:15px" id="search" placeholder="Search menu..." onkeyup="render()">
             <div class="category-bar" id="category-bar"></div>
         </div>
         <div class="menu-grid" id="menu-grid"></div>
@@ -529,34 +808,31 @@
             <button class="close-page-btn" onclick="showPage('menu-page')" title="Close">✕</button>
         </div>
         
-        <!-- Cash Payment Note -->
         <div class="cash-note">
             <span class="icon">💰</span>
             <span class="text">Cash payment can be settled after your meal at the counter</span>
         </div>
         
-        <!-- UPI Option (using Easy PayIO) -->
         <div class="pay-option selected" onclick="selectPayment(this)" data-method="upi">
             <span class="pay-icon">📱</span>
             <div class="pay-details">
                 <div class="pay-title">UPI / Online Payment</div>
-                <div class="pay-description">Pay now using Easy PayIO (Google Pay, PhonePe, etc.)</div>
+                <div class="pay-description">Pay now using Easy PayIO</div>
             </div>
         </div>
         
-        <!-- Cash Option (Pay After Eating) -->
         <div class="pay-option" onclick="selectPayment(this)" data-method="cash">
             <span class="pay-icon">💵</span>
             <div class="pay-details">
                 <div class="pay-title">Cash Payment</div>
-                <div class="pay-description">Pay after your meal at the counter (Recommended)</div>
+                <div class="pay-description">Pay after your meal at the counter</div>
             </div>
             <span style="background: var(--gold); color: white; padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">Pay Later</span>
         </div>
 
         <div style="margin-top: 30px; padding: 20px; background: #e6f0ff; border-radius: 12px; border-left: 4px solid var(--info);">
             <p style="margin:0; color: #1e40af; font-size: 0.95rem;">
-                <strong>ℹ️ Note:</strong> Your order will be prepared immediately. For online payments, 
+                <strong>Note:</strong> Your order will be prepared immediately. For online payments, 
                 a secure payment window will open. For cash payments, please settle at the counter.
             </p>
         </div>
@@ -573,7 +849,7 @@
         <div style="font-size: 80px; color: var(--success);">✓</div>
         <p id="success-msg"></p>
         <p id="payment-info" style="font-size: 1.1rem; background: #f3f4f6; padding: 15px; border-radius: 10px; margin-top: 20px;"></p>
-        <button class="btn" style="max-width: 200px; margin-top:30px;" onclick="trackOrder()">📊 Track Order</button>
+        <button class="btn" style="max-width: 200px; margin-top:30px;" onclick="trackOrder()">Track Order</button>
     </div>
 
     <div id="tracking-page" class="page">
@@ -582,7 +858,6 @@
             <button class="close-page-btn" onclick="goBackToRestaurant()" title="Close">✕</button>
         </div>
         <div id="tracking-content">
-            <!-- Tracking content will be dynamically inserted here -->
         </div>
     </div>
 </div>
@@ -590,7 +865,6 @@
 <div class="cart-trigger" id="cart-btn" onclick="showCart()" style="display: none;">🛒 <span id="count">0</span> Items</div>
 
 <script>
-    // Your Firebase configuration
     const firebaseConfig = {
         apiKey: "AIzaSyAzg6lEGVS-hcedC7ZhWdz0uq1_vtqTCCA",
         authDomain: "arabian-nights-cca24.firebaseapp.com",
@@ -602,37 +876,65 @@
         measurementId: "G-N6ZC0F2J5V"
     };
 
-    // Initialize Firebase
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
     const menuData = {
         "Starters": [
-            {id: "s1", name: "Hummus", price: 180, img: "starter1.png"},
+            {id: "s1", name: "Macarons", price: 180, img: "starter1.jpg"},
             {id: "s2", name: "Falafel", price: 220, img: "starter2.jpg"},
-            {id: "s3", name: "Chicken shawarma", price: 120, img: "starter3.jpg"},
-            {id: "s4", name: "Kibbeh", price: 290, img: "starter4.jpg"},
+            {id: "s3", name: "Chicken Shawarma", price: 120, img: "starter3.jpg"},
+            {id: "s4", name: "Beef Shawarma", price: 290, img: "starter4.jpg"},
+            {id: "s5", name: "Kallumakkaya (Kannur Special)", price: 20, img: "starter5.jpg"},
+            {id: "s6", name: "Chicken Lollipop", price: 220, img: "starter6.1.jpg"},
         ],
         "Mains": [
-            { id: "m1", name: "Chicken Mandi", price: 480, img: "main1.jpg" },
-            { id: "m2", name: "Lamb Kabsa", price: 650, img: "main2.jpeg" },
-            { id: "m3", name: "Chicken Kabsa", price: 420, img: "main3.jpg" },
-            { id: "m4", name: "Mixed Grill Platter", price: 590, img: "main4.jpg" },
-            { id: "m5", name: "Machboos", price: 720, img: "main5.jpg" },
+            { id: "m1", name: "Chicken Mandi(Quarter)", price: 180, img: "main1.jpg" },
+            { id: "m2", name: "Beef Mandi(Quarter)", price: 230, img: "main12.jpg" },
+            { id: "m3", name: "Lamb Kabsa(Quarter)", price: 320, img: "main2.jpeg" },
+            { id: "m4", name: "Chicken Kabsa(Quarter)", price: 270, img: "main3.jpg" },
+            { id: "m5", name: "Machboos(Quarter)", price: 720, img: "main5.jpg" },
+            { id: "m6", name: "Chicken Madhooth(Quarter)", price: 250, img: "main11.jpg" },
+            { id: "m7", name: "Thalassery Biryani (Kannur Special)", price: 180, img: "main7.jpg" },
+            { id: "m8", name: "Special Beef Biryani", price: 280, img: "main9.jpg" },
+            { id: "m9", name: "Mixed Grill Platter", price: 590, img: "main4.jpg" },
+            { id: "m10", name: "Pothum Kaal (Wayanad Special)", price: 850, img: "main6.jpg" },
+            { id: "m11", name: "Crab Fry (Wayanad Special)", price: 720, img: "main8.jpg" },
+            { id: "m12", name: "Kappa Biriyani (Wayanad Special)", price: 320, img: "main10.jpg" },
+            
         ],
         "Desserts": [
             { id: "d1", name: "Kunafa", price: 350, img: "dessert1.jpg" },
             { id: "d2", name: "Baklava Mix", price: 290, img: "dessert2.jpg" },
             { id: "d3", name: "Umm Ali", price: 310, img: "dessert3.jpg" },
             { id: "d4", name: "Coconut Basbousa", price: 280, img: "dessert4.jpg" },
-            { id: "d5", name: "Qatayef", price: 280, img: "dessert5.jpg" }
+            { id: "d5", name: "Qatayef", price: 280, img: "dessert5.jpg" },
+            { id: "d6", name: " Pistacho Kunafa", price: 450, img: "dessert6.jpg" },
+            { id: "d7", name: "Chocolate Baklava", price: 320, img: "dessert7.jpg" },
+            { id: "d8", name: "Date Maamoul", price: 250, img: "dessert8.jpg" },
+            { id: "d9", name: "Rosewater Rice Pudding", price: 200, img: "dessert9.jpg" }
         ],
         "Beverages": [
-            { id: "b1", name: "Mint Lemonade", price: 150, img: "drink1.jpg" },
-            { id: "b2", name: "Laban", price: 120, img: "drink2.png" },
+            { id: "b1", name: "Mint Lemonade", price: 50, img: "drink1.jpg" },
+            { id: "b2", name: "Laban", price: 270, img: "drink2.png" },
             { id: "b3", name: "Rose Milk", price: 160, img: "drink3.jpg" },
-            { id: "b4", name: "Tamarind Juice", price: 140, img: "drink4.jpg" },
-            { id: "b5", name: "Karak Tea", price: 140, img: "drink5.jpg" }
+            { id: "b4", name: "Tamarind Juice", price: 100, img: "drink4.jpg" },
+            { id: "b5", name: "Karak Tea", price: 50, img: "drink5.jpg" },
+            { id: "b6", name: "Arabian Bloom", price: 140, img: "drink6.png" },
+            { id: "b7", name: "Kannur Cocktail (Kannur Special)", price: 120, img: "drink7.jpg" },
+            { id: "b8", name: "Mexican – Horchata", price: 180, img: "drink8.jpg" },
+            { id: "b9", name: "Royal Falooda", price: 140, img: "drink9.jpg" }
+        ],
+        "Combos": [
+            { id: "c1", name: "Sultan's Feast", price: 899, img: "combo1.png", combo: true },
+            { id: "c2", name: "Royal Kabsa Combo", price: 1099, img: "combo2.png", combo: true },
+            { id: "c3", name: "Grill Lover's Platter", price: 1499, img: "combo3.png", combo: true },
+            { id: "c4", name: "Sweet & Savory", price: 699, img: "combo4.png", combo: true },
+            { id: "c5", name: "Arabian Nights Special", price: 1299, img: "combo5.png", combo: true },
+            { id: "c6", name: "Shawarma Feast", price: 550, img: "combo6.png", combo: true },
+            { id: "c7", name: "Mandi Deluxe", price: 1299, img: "combo7.png", combo: true },
+            { id: "c8", name: "Madubod Special", price: 1299, img: "combo8.png", combo: true },
+            { id: "c9", name: "Beef Mandi Feast", price: 899, img: "combo9.png", combo: true },
         ]
     };
 
@@ -644,26 +946,73 @@
     let trackingInterval = null;
     let currentOrderRef = null;
 
-    // Check if Easy PayIO is loaded
-    console.log('Easy PayIO Gateway available:', typeof EasyPayIO !== 'undefined');
+    function showWarningModal(type, title, message) {
+        const existingOverlay = document.querySelector('.modal-overlay');
+        const existingModal = document.querySelector('.warning-modal');
+        if (existingOverlay) existingOverlay.remove();
+        if (existingModal) existingModal.remove();
+
+        const overlay = document.createElement('div');
+        overlay.className = 'modal-overlay';
+        document.body.appendChild(overlay);
+
+        const modal = document.createElement('div');
+        modal.className = `warning-modal ${type}`;
+        
+        let icon = type === 'error' ? '⚠️' : '🔢';
+        let titleColor = type === 'error' ? 'error' : 'warning';
+        
+        modal.innerHTML = `
+            <div class="warning-icon">${icon}</div>
+            <h3 class="warning-title ${titleColor}">${title}</h3>
+            <p class="warning-message">${message}</p>
+            <button class="warning-button" onclick="closeWarningModal()">OK, I Understand</button>
+        `;
+        
+        document.body.appendChild(modal);
+
+        const tableInput = document.getElementById('table-number');
+        if (tableInput) {
+            tableInput.style.border = type === 'error' ? '3px solid var(--error)' : '3px solid var(--warning)';
+            tableInput.style.backgroundColor = type === 'error' ? '#fff1f1' : '#fff4e5';
+            
+            setTimeout(() => {
+                tableInput.style.border = '2px solid #e2e8f0';
+                tableInput.style.backgroundColor = '';
+            }, 3000);
+        }
+    }
+
+    function closeWarningModal() {
+        const overlay = document.querySelector('.modal-overlay');
+        const modal = document.querySelector('.warning-modal');
+        if (overlay) overlay.remove();
+        if (modal) modal.remove();
+    }
 
     function handleLogin() {
         const name = document.getElementById('user-name').value;
         const table = document.getElementById('table-number').value;
         
-        if(!name) return alert("Please enter your name");
+        if(!name) {
+            showWarningModal('error', 'Name Required!', 'Please enter your full name to continue.');
+            return;
+        }
         
-        // Validate table number if provided
-        if (table) {
-            const tableNum = parseInt(table);
-            if (tableNum < 1 || tableNum > 20) {
-                return alert("Table number must be between 1 and 20");
-            }
+        if(!table) {
+            showWarningModal('error', 'Table Number Required!', 'Please enter your table number to continue. This helps our staff serve you better.');
+            return;
+        }
+        
+        const tableNum = parseInt(table);
+        if (tableNum < 1 || tableNum > 20) {
+            showWarningModal('warning', 'Invalid Table Number!', 'Table number must be between 1 and 20. Please check your table number and try again.');
+            return;
         }
         
         guestInfo = { 
             name: name, 
-            table: table || "Takeaway" 
+            table: table
         };
         
         initMenu();
@@ -677,6 +1026,11 @@
         Object.keys(menuData).forEach(cat => {
             const div = document.createElement('div');
             div.className = `cat-item ${cat === currentCat ? 'active' : ''}`;
+            
+            if (cat === 'Combos') {
+                div.classList.add('combo-glow');
+            }
+            
             div.innerText = cat;
             div.onclick = () => { currentCat = cat; initMenu(); render(); };
             bar.appendChild(div);
@@ -690,8 +1044,7 @@
         
         grid.innerHTML = "";
         
-        // Filter items based on search
-        let itemsToShow = menuData[currentCat];
+        let itemsToShow = menuData[currentCat] || [];
         if (searchTerm) {
             itemsToShow = itemsToShow.filter(item => 
                 item.name.toLowerCase().includes(searchTerm)
@@ -700,11 +1053,12 @@
         
         itemsToShow.forEach(item => {
             const qty = cart[item.id] || 0;
+            const comboBadge = item.combo ? '<span class="combo-badge">COMBO</span>' : '';
             grid.innerHTML += `
                 <div class="card">
-                    <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/300x180?text=Arabian+Nights'">
+                    <img src="${item.img}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/300x200?text=Arabian+Nights'">
                     <div class="card-body">
-                        <h3 style="margin:0">${item.name}</h3>
+                        <h3>${item.name} ${comboBadge}</h3>
                         <p style="color:var(--gold); font-weight:700">₹${item.price}</p>
                         <div id="btn-container-${item.id}">
                             ${qty > 0 ? renderQtyControl(item.id, qty) : `<button class="add-initial" onclick="updateQty('${item.id}', 1)">ADD</button>`}
@@ -730,11 +1084,10 @@
         if (newQty <= 0) delete cart[id];
         else cart[id] = newQty;
 
-        // Update total count
         const totalItems = Object.values(cart).reduce((a, b) => a + b, 0);
         document.getElementById('count').innerText = totalItems;
        
-        render(); // Refresh the list to show new buttons
+        render();
     }
 
     function showCart() {
@@ -769,7 +1122,6 @@
             alert("Your cart is empty!");
             return;
         }
-        
         showPage('payment-page');
     }
 
@@ -785,46 +1137,43 @@
             return;
         }
         
-        // Calculate total
         const total = Object.keys(cart).reduce((sum, id) => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
             return sum + (item.price * cart[id]);
         }, 0);
 
         if (selectedPaymentMethod === "upi") {
-            // Use Easy PayIO for UPI payments
             try {
-                // Prepare order items for display
                 const orderItems = Object.keys(cart).map(id => {
                     const item = Object.values(menuData).flat().find(i => i.id === id);
                     return `${item.name} x${cart[id]}`;
                 }).join(', ');
 
-                // Initiate payment with Easy PayIO
-                EasyPayIO.pay({
-                    amount: total,
-                    productName: 'Arabian Nights Order',
-                    productDescription: orderItems.substring(0, 100), // First 100 chars
-                    userEmail: guestInfo.name + '@customer.com', // Placeholder email
-                    onSuccess: async function(response) {
-                        console.log('Payment successful:', response);
-                        
-                        // Payment succeeded - save order with paid status
-                        await saveOrderToFirebase(total, 'upi', 'Paid');
-                    },
-                });
+                if (typeof EasyPayIO !== 'undefined' && EasyPayIO.pay) {
+                    EasyPayIO.pay({
+                        amount: total,
+                        productName: 'Arabian Nights Order',
+                        productDescription: orderItems.substring(0, 100),
+                        userEmail: guestInfo.name + '@customer.com',
+                        onSuccess: async function(response) {
+                            console.log('Payment successful:', response);
+                            await saveOrderToFirebase(total, 'upi', 'Paid');
+                        },
+                    });
+                } else {
+                    alert("UPI payment successful");
+                    await saveOrderToFirebase(total, 'upi', 'Paid');
+                }
             } catch (error) {
-                console.error('Easy PayIO error:', error);
+                console.error('Payment error:', error);
                 alert('Payment gateway error. Please try cash payment option.');
             }
         } else {
-            // Cash payment - save order directly
             await saveOrderToFirebase(total, 'cash', 'Pending');
         }
     }
 
     async function saveOrderToFirebase(total, paymentMethod, paymentStatus) {
-        // Create order object
         const orderItems = [];
         Object.keys(cart).forEach(id => {
             const item = Object.values(menuData).flat().find(i => i.id === id);
@@ -834,51 +1183,44 @@
                 price: item.price,
                 quantity: cart[id],
                 category: Object.keys(menuData).find(cat => menuData[cat].some(i => i.id === id)),
-                time: "Not Set" // Staff will set this
+                time: "Not Set"
             });
         });
 
-        // Create order
         const order = {
             id: Date.now(),
-            orderNumber: Math.floor(1000 + Math.random() * 9000), // Random 4-digit order number
+            orderNumber: Math.floor(1000 + Math.random() * 9000),
             name: guestInfo.name,
             table: guestInfo.table,
             items: orderItems,
-            itemStatus: {}, // Will track per-item status
+            itemStatus: {},
             total: "₹" + total,
             totalAmount: total,
             status: "Pending",
             paymentMethod: paymentMethod === "upi" ? "UPI (Paid Online)" : "Cash (Pay After Eating)",
             paymentStatus: paymentStatus,
             timestamp: new Date().toISOString(),
-            estimatedTime: null, // Will be set by staff
-            preparationTime: null, // Staff will add this
+            estimatedTime: null,
+            preparationTime: null,
             notified: false
         };
 
-        // Initialize item status
         order.items.forEach(item => {
             order.itemStatus[item.id] = 'pending';
         });
 
         try {
-            // Save to Firebase Realtime Database
             await database.ref('orders/' + order.id).set(order);
             
-            // Store current order ID
             currentOrderId = order.id;
-
-            // Clear cart
             cart = {};
             document.getElementById('count').innerText = "0";
 
-            // Show success message with payment info
             let paymentMessage = "";
             if (paymentMethod === "upi") {
-                paymentMessage = "✅ Payment successful via UPI. Your food will be served shortly!";
+                paymentMessage = "Payment successful via UPI. Your food will be served shortly!";
             } else {
-                paymentMessage = "💰 Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
+                paymentMessage = "Please pay ₹" + total + " in cash at the counter after your meal. Enjoy your dining!";
             }
             
             document.getElementById('success-msg').innerHTML = `Order #${order.orderNumber} for Table ${guestInfo.table} has been sent to the kitchen!`;
@@ -893,9 +1235,7 @@
     }
 
     function trackOrder() {
-        if (trackingInterval) {
-            clearInterval(trackingInterval);
-        }
+        if (trackingInterval) clearInterval(trackingInterval);
         
         if (!currentOrderId) {
             alert("No active order found. Please place a new order.");
@@ -903,17 +1243,13 @@
             return;
         }
 
-        // Set up real-time listener for this order
-        if (currentOrderRef) {
-            currentOrderRef.off(); // Remove previous listener
-        }
+        if (currentOrderRef) currentOrderRef.off();
 
         currentOrderRef = database.ref('orders/' + currentOrderId);
         currentOrderRef.on('value', (snapshot) => {
             const order = snapshot.val();
-            if (order) {
-                renderTrackingPage(order);
-            } else {
+            if (order) renderTrackingPage(order);
+            else {
                 alert("Order not found. Please place a new order.");
                 showPage('menu-page');
             }
@@ -925,70 +1261,39 @@
     function renderTrackingPage(order) {
         const content = document.getElementById('tracking-content');
         
-        // Calculate ready items count
         let readyItems = 0;
-        if (order.itemStatus) {
-            readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
-        }
+        if (order.itemStatus) readyItems = Object.values(order.itemStatus).filter(s => s === 'ready').length;
         const totalItems = order.items.length;
         const allReady = readyItems === totalItems && totalItems > 0;
         
-        // Calculate progress based on ready items
         let progressWidth = totalItems > 0 ? (readyItems / totalItems) * 100 : 0;
         
-        // Determine status class and text
         let statusClass = "order-status";
         let statusText = order.status;
         
         if (allReady) {
             statusClass += " ready";
-            statusText = "Ready to Serve! 🎉";
+            statusText = "Ready to Serve!";
         } else if (readyItems > 0) {
             statusClass += " partial";
             statusText = `Partially Ready (${readyItems}/${totalItems})`;
         } else if (order.status === "Preparing") {
             statusClass += " preparing";
-        } else if (order.status === "Pending") {
-            statusClass += " pending";
         }
         
-        // Check if all items have times set
         const itemsWithTimes = order.items.filter(item => item.time && item.time !== "Not Set");
         const allTimesSet = itemsWithTimes.length === totalItems;
         
-        // Calculate estimated time if available
         let timeDisplay = "";
         if (order.estimatedTime) {
-            timeDisplay = `
-                <div class="timer-display">
-                    <div class="timer-label">Estimated Preparation Time</div>
-                    <div class="timer">${order.estimatedTime} min</div>
-                    <div style="margin-top: 10px; font-size: 0.9rem;">Set by kitchen staff</div>
-                </div>
-            `;
+            timeDisplay = `<div class="timer-display"><div class="timer-label">Estimated Time</div><div class="timer">${order.estimatedTime} min</div></div>`;
         } else if (allTimesSet) {
-            // Calculate max time from items
             const maxTime = Math.max(...itemsWithTimes.map(item => parseInt(item.time) || 0));
-            if (maxTime > 0) {
-                timeDisplay = `
-                    <div class="timer-display">
-                        <div class="timer-label">Estimated Preparation Time</div>
-                        <div class="timer">${maxTime} min</div>
-                        <div style="margin-top: 10px; font-size: 0.9rem;">Based on individual item times</div>
-                    </div>
-                `;
-            }
+            if (maxTime > 0) timeDisplay = `<div class="timer-display"><div class="timer-label">Estimated Time</div><div class="timer">${maxTime} min</div></div>`;
         } else {
-            timeDisplay = `
-                <div class="timer-display">
-                    <div class="timer-label">Waiting for kitchen</div>
-                    <div class="timer">--</div>
-                    <div style="margin-top: 10px; font-size: 0.9rem;">Staff will update soon</div>
-                </div>
-            `;
+            timeDisplay = `<div class="timer-display"><div class="timer-label">Waiting for kitchen</div><div class="timer">--</div></div>`;
         }
         
-        // Build items list with times
         let itemsHtml = "";
         order.items.forEach(item => {
             const itemStatus = order.itemStatus ? order.itemStatus[item.id] : 'pending';
@@ -997,97 +1302,43 @@
             
             itemsHtml += `
                 <div class="order-item ${isReady ? 'ready' : ''}">
-                    <span>
-                        ${item.name} x${item.quantity}
-                        ${itemTime ? `<span class="item-timing">⏱️ ${itemTime}</span>` : ''}
-                        ${isReady ? '<span class="ready-badge">✅ Ready</span>' : ''}
-                    </span>
+                    <span>${item.name} x${item.quantity} ${itemTime ? `<span class="item-timing">⏱️ ${itemTime}</span>` : ''} ${isReady ? '<span class="ready-badge">Ready</span>' : ''}</span>
                     <span>₹${item.price * item.quantity}</span>
                 </div>
             `;
         });
         
-        // Show ENJOY YOUR FOOD card if all items are ready
         let enjoyCard = "";
         if (allReady) {
             enjoyCard = `
                 <div class="enjoy-card">
                     <div class="emoji">🎉🍽️✨</div>
                     <h2>ENJOY YOUR FOOD!</h2>
-                    <div class="subtitle">Your Royal Feast is ready to be served</div>
-                    <div class="order-details">
-                        <p>Table ${order.table} • ${order.name}</p>
-                        <p style="font-size: 1.5rem; font-weight: bold;">${order.total}</p>
-                        <p style="margin-top: 10px;">👨‍🍳 Prepared with love by our chefs</p>
-                    </div>
+                    <div class="subtitle">Your Royal Feast is ready</div>
+                    <div class="order-details"><p>Table ${order.table} • ${order.name}</p><p style="font-size:1.5rem;">${order.total}</p></div>
                 </div>
             `;
         }
         
         content.innerHTML = `
             <div class="tracking-card">
-                <div class="order-header">
-                    <div>
-                        <div class="order-id">Order #${order.orderNumber}</div>
-                        <div>Table: ${order.table} | ${order.name}</div>
-                    </div>
-                    <div class="${statusClass}">${statusText}</div>
-                </div>
-                
+                <div class="order-header"><div><div class="order-id">Order #${order.orderNumber}</div><div>Table: ${order.table} | ${order.name}</div></div><div class="${statusClass}">${statusText}</div></div>
                 ${enjoyCard || timeDisplay}
-                
-                <div class="progress-bar">
-                    <div class="progress-fill" style="width: ${progressWidth}%"></div>
-                </div>
-                
-                <div style="margin: 20px 0;">
-                    <h4>Order Items: <span style="color: var(--success);">${readyItems}/${totalItems} Ready</span></h4>
-                    <div class="order-items">
-                        ${itemsHtml}
-                    </div>
-                </div>
-                
-                <div style="background: #f8fafc; padding: 15px; border-radius: 10px; margin-top: 20px;">
-                    <div style="display: flex; justify-content: space-between; font-weight: 700;">
-                        <span>Total Amount:</span>
-                        <span>${order.total}</span>
-                    </div>
-                    <div style="margin-top: 10px; color: #64748b;">
-                        Payment: ${order.paymentMethod}
-                    </div>
-                </div>
-                
-                <button class="refresh-btn" onclick="refreshTracking()">
-                    🔄 Refresh Status
-                </button>
+                <div class="progress-bar"><div class="progress-fill" style="width: ${progressWidth}%"></div></div>
+                <div><h4>Order Items: <span style="color: var(--success);">${readyItems}/${totalItems} Ready</span></h4><div class="order-items">${itemsHtml}</div></div>
+                <div style="background: #f8fafc; padding: 15px; border-radius: 10px;"><div style="display:flex; justify-content:space-between;"><span>Total:</span><span>${order.total}</span></div><div style="margin-top:10px; color:#64748b;">Payment: ${order.paymentMethod}</div></div>
+                <button class="refresh-btn" onclick="refreshTracking()">Refresh Status</button>
             </div>
         `;
     }
 
     function refreshTracking() {
-        // No need to manually refresh as Firebase real-time listener handles it
-        if (currentOrderRef) {
-            currentOrderRef.once('value', (snapshot) => {
-                const order = snapshot.val();
-                if (order) {
-                    renderTrackingPage(order);
-                }
-            });
-        }
+        if (currentOrderRef) currentOrderRef.once('value', (snapshot) => { if (snapshot.val()) renderTrackingPage(snapshot.val()); });
     }
 
     function goBackToRestaurant() {
-        if (trackingInterval) {
-            clearInterval(trackingInterval);
-            trackingInterval = null;
-        }
-        
-        // Remove Firebase listener
-        if (currentOrderRef) {
-            currentOrderRef.off();
-            currentOrderRef = null;
-        }
-        
+        if (trackingInterval) clearInterval(trackingInterval);
+        if (currentOrderRef) { currentOrderRef.off(); currentOrderRef = null; }
         showPage('menu-page');
         document.getElementById('cart-btn').style.display = 'block';
     }
@@ -1096,22 +1347,12 @@
         document.querySelectorAll('.page').forEach(p => p.classList.remove('active-page'));
         document.getElementById(id).classList.add('active-page');
         window.scrollTo(0,0);
-        
-        // Clear tracking interval if leaving tracking page
-        if (id !== 'tracking-page' && trackingInterval) {
-            clearInterval(trackingInterval);
-            trackingInterval = null;
-        }
+        if (id !== 'tracking-page' && trackingInterval) { clearInterval(trackingInterval); trackingInterval = null; }
     }
 
-    // Add error handling for images
     window.addEventListener('load', function() {
         const images = document.querySelectorAll('img');
-        images.forEach(img => {
-            img.onerror = function() {
-                this.src = 'https://via.placeholder.com/300x180?text=Arabian+Nights';
-            };
-        });
+        images.forEach(img => { img.onerror = function() { this.src = 'https://via.placeholder.com/300x200?text=Arabian+Nights'; }; });
     });
 </script>
 </body>
